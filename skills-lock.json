@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "guizang-ppt-skill": {
+      "source": "op7418/guizang-ppt-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "7fd37d43e50eafea430ab480091489d123c5d7b2e59e96c0643fec98d2311498"
+    }
+  }
+}
