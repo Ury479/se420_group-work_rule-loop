@@ -183,6 +183,15 @@ export default async function ConversionDetailPage({ params }: { params: Promise
         </section>
       ) : null}
 
+      <section className="flex flex-col gap-3 rounded-xl border border-primary/35 bg-card p-5">
+        <h2 className="text-lg font-semibold">这笔投入，我想验证什么？</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">带上当时的金额与比较选项，留下一个期待。已有工具够用、先不买，也可以约一次回访。</p>
+        <Link href={`/spending-review/preview?conversion=${conversion.id}`} className="inline-flex min-h-11 w-fit items-center text-sm text-primary underline underline-offset-4">
+          带入这次换算，预览验证卡
+        </Link>
+        <p className="text-sm text-muted-foreground">隔离预览：不写入真实记录，不创建外部提醒。购买前冷静期与结果回访节点相互独立。</p>
+      </section>
+
       <ConversionDetailActions conversionId={conversion.id} ruleId={conversion.ruleId} />
     </main>
   )

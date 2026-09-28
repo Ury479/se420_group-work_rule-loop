@@ -118,6 +118,14 @@ export default async function SpendingReviewPage() {
         </div>
       </header>
 
+      <section className="flex flex-col gap-3 rounded-xl border border-primary/35 bg-card p-5">
+        <h2 className="text-lg font-semibold">这笔投入，后来真正帮到了什么？</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">留下期待，对照结果与未知，再约一次最小验证。新版为隔离设计预览，不改动原有审查记录。</p>
+        <Link href="/spending-review/preview" className={cn(buttonVariants({ variant: "outline" }), "min-h-11 w-fit")}>
+          打开新版消费审查预览
+        </Link>
+      </section>
+
       <Section title="待冷静决策" icon={Hourglass} items={stats.cooling} empty="没有处于冷静期的决策。" />
       <Section title="待 GPT 审核" icon={Bot} items={stats.awaitingGpt} empty="没有等待外部审核的支出。" />
       <Section title="待人工确认" icon={UserCheck} items={stats.awaitingFinal} empty="没有等待最终确认的支出。" />
