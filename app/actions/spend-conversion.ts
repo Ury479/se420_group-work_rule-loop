@@ -5,6 +5,7 @@ import { conversionPreferences, confirmationRules, eventCases, spendConversions,
 import { getUserId } from "@/lib/user"
 import { and, desc, eq, inArray, sql } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import { z } from "zod"
 import {
   MAX_COOLDOWN_MINUTES,
@@ -174,11 +175,13 @@ export async function createSpendConversion(input: z.infer<typeof createSchema>)
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "输入无效" }
   const data = parsed.data
 
-  const prefs = await ensurePreferences(userId)
-  const rows = await db
-    .select()
-    .from(spendingAnchors)
-    .where(and(eq(spendingAnchors.userId, userId), inArray(spendingAnchors.id, data.catalogItemIds)))
+  const [prefs, rows] = await Promise.all([
+    ensurePreferences(userId),
+    db
+      .select()
+      .from(spendingAnchors)
+      .where(and(eq(spendingAnchors.userId, userId), inArray(spendingAnchors.id, data.catalogItemIds))),
+  ])
   if (rows.length === 0) return { error: "选中的比较项不存在" }
   const invalid = rows.find((row) => row.priceMinor <= 0)
   if (invalid) return { error: `「${invalid.name}」缺少有效单价,请先在目录中补全` }
@@ -235,7 +238,7 @@ export async function createSpendConversion(input: z.infer<typeof createSchema>)
     .returning({ id: spendConversions.id })
 
   revalidatePath("/convert")
-  return { id: row.id }
+  redirect(`/convert/${row.id}`)
 }
 
 const cooldownSchema = z.object({
@@ -480,6 +483,7 @@ export async function updateConversionPreferences(input: z.infer<typeof prefsSch
     .where(eq(conversionPreferences.userId, userId))
   revalidatePath("/convert/catalog")
   revalidatePath("/convert")
+  revalidatePath("/convert/[id]", "page")
   return { ok: true }
 }
 
@@ -497,12 +501,32 @@ export async function deleteSpendConversion(id: number) {
   }
   await db.delete(spendConversions).where(and(eq(spendConversions.id, id), eq(spendConversions.userId, userId)))
   revalidatePath("/convert")
+  revalidatePath(`/convert/${id}`)
   return { ok: true }
 }
 
-/** 换算详情:同时返回解析后的快照,快照损坏时降级为 null */
+/** 换算详情:同一次查询读取记录和偏好,快照损坏时降级为 null */
 export async function getConversionDetail(id: number) {
-  const row = await getConversion(id)
+  const userId = await getUserId()
+  if (!Number.isSafeInteger(id) || id <= 0) return null
+  const [row] = await db
+    .select({
+      conversion: spendConversions,
+      prefs: {
+        privacyMode: conversionPreferences.privacyMode,
+        defaultCooldownMinutes: conversionPreferences.defaultCooldownMinutes,
+        usdToCnyRate: conversionPreferences.usdToCnyRate,
+      },
+    })
+    .from(spendConversions)
+    .leftJoin(conversionPreferences, eq(conversionPreferences.userId, userId))
+    .where(and(eq(spendConversions.id, id), eq(spendConversions.userId, userId)))
+    .limit(1)
   if (!row) return null
-  return { conversion: row, snapshot: parseSnapshot(row.snapshotJson) }
+  return {
+    conversion: row.conversion,
+    snapshot: parseSnapshot(row.conversion.snapshotJson),
+    // 缺少偏好时沿用表默认值;浏览或预取详情不应触发写入。
+    prefs: row.prefs ?? { privacyMode: "neutral", defaultCooldownMinutes: 120, usdToCnyRate: "7.000000" },
+  }
 }

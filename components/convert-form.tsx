@@ -3,7 +3,6 @@
 // 价值换算输入页:大金额输入 + 双段状态 + 类别行 + 比较锚点勾选 + 汇率内联编辑,对齐参考稿
 import { useMemo, useState, useTransition } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Check, ChevronDown, Hourglass, CircleCheck, Info, Lock, Pencil, Plus, Repeat, ShieldCheck } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -42,7 +41,6 @@ export function ConvertForm({
   initialStage?: DecisionStage
   prefs: Prefs
 }) {
-  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -127,7 +125,6 @@ export function ConvertForm({
         setError(res.error)
         return
       }
-      if ("id" in res) router.push(`/convert/${res.id}`)
     })
   }
 

@@ -135,6 +135,7 @@ export default async function ConvertPage({
                 <li key={row.id}>
                   <Link
                     href={`/convert/${row.id}`}
+                    prefetch={true}
                     className="shadow-card flex min-h-16 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/50"
                   >
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">

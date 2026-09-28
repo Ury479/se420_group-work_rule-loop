@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, ShieldCheck } from "lucide-react"
-import { getConversionDetail, getConversionPreferences } from "@/app/actions/spend-conversion"
+import { getConversionDetail } from "@/app/actions/spend-conversion"
 import { ConversionCooldownPanel } from "@/components/conversion-cooldown-panel"
 import { ConversionDetailActions } from "@/components/conversion-detail-actions"
 import { ConversionResolveForm } from "@/components/conversion-resolve-form"
@@ -28,12 +28,12 @@ export const metadata = { title: "换算结果 | 决策拦截台" }
 
 export default async function ConversionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const conversionId = Number.parseInt(id, 10)
-  if (!Number.isInteger(conversionId)) notFound()
+  const conversionId = Number(id)
+  if (!/^\d+$/.test(id) || !Number.isSafeInteger(conversionId) || conversionId <= 0) notFound()
 
-  const [detail, prefs] = await Promise.all([getConversionDetail(conversionId), getConversionPreferences()])
+  const detail = await getConversionDetail(conversionId)
   if (!detail) notFound()
-  const { conversion, snapshot } = detail
+  const { conversion, snapshot, prefs } = detail
 
   const stage = conversion.decisionStage as DecisionStage
   const resolution = conversion.resolution as Resolution | null
