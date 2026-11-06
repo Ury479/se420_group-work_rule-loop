@@ -2,7 +2,10 @@
 // 完全在浏览器本地完成文本替换,不调用任何 AI 接口,零 token 消耗。
 
 // 精确匹配词条(以去除首尾空白后的整段文本为键)
+import { SPENDING_CHECKPOINT_TRANSLATIONS } from "@/lib/spending-checkpoint-translations"
+
 export const EXACT_DICT: Record<string, string> = {
+  ...SPENDING_CHECKPOINT_TRANSLATIONS,
   // 导航
   "关键确认台": "Critical Confirm Desk",
   "确认台": "Dashboard",
@@ -277,7 +280,7 @@ export const EXACT_DICT: Record<string, string> = {
 
   // 关系阶段判断与沟通闭环
   "关系阶段与沟通闭环": "Relationship stage and communication loop",
-  "当前情感状���": "Current emotional state",
+  "当前情感状�����": "Current emotional state",
   "先判断自己是否适合行动，不把情绪当成关系事实。": "First decide whether you are ready to act; do not treat emotion as relationship fact.",
   "记录新状态": "Record a new state",
   "行动准备度": "Action readiness",
@@ -741,10 +744,10 @@ export const EXACT_DICT: Record<string, string> = {
   "新增需求太多,P0 未完成又继续加 P1/P2。": "Too many new demands: adding P1/P2 while P0 is unfinished.",
   "任��快完成时想跳过检查。": "Wanting to skip checks when a task is almost done.",
   "提交错文件、看错入口、漏看要求。": "Submitting the wrong file, misreading the entry, missing requirements.",
-  "为了满足别人情绪而承诺超出能力��围的事情。": "Committing beyond capacity to soothe others' emotions.",
+  "为了满足别人情绪而承诺超出��力��围的事情。": "Committing beyond capacity to soothe others' emotions.",
   "工具、课程、会员、大额消��冲动。": "Impulses for tools, courses, memberships and big purchases.",
   "同时推进太多方向,主线被稀��。": "Pushing too many directions at once, diluting the main line.",
-  "P0 锁�� / 需求 Backlog": "P0 lock / Demand backlog",
+  "P0 锁���� / 需求 Backlog": "P0 lock / Demand backlog",
   "先完成一个关键因,新��需求进入 Backlog。": "Finish one key factor first; new demands go to the backlog.",
   "稳定模��� / 90% 检查": "Stabilize mode / 90% check",
   "先停 10 秒,进入 90% 快速检查再执行。": "Pause 10 seconds and run the 90% quick check before acting.",
@@ -839,7 +842,7 @@ export const EXACT_DICT: Record<string, string> = {
   "��如:平台、���件名、文件内���、Submit 成功页": "E.g. platform, file name, contents, submit success page",
   "例如:Canvas / Teams / 教室 A302": "E.g. Canvas / Teams / Room A302",
   "例如:月付看成年付 / 自动续费没看清": "E.g. mistook yearly for monthly / missed auto-renewal",
-  "例如:金额、周期、��种、自动续费、退��规则": "E.g. amount, cycle, currency, auto-renewal, refund policy",
+  "例如:金额、周期�����种、自动续费、退��规则": "E.g. amount, cycle, currency, auto-renewal, refund policy",
   "��如:官网付款页 / App Store": "E.g. official payment page / App Store",
   "例如:发���对象 / 语气不合��� / 情绪化发送": "E.g. wrong recipient / bad tone / emotional sending",
   "例如:对象、目的、语气、发送时机": "E.g. recipient, purpose, tone, timing",
@@ -1228,7 +1231,7 @@ export const EXACT_DICT: Record<string, string> = {
   "分析中…": "Analyzing…",
   "已构成过度执行,稳定高于一切,先停下来。": "This is over-execution. Stability above all — stop first.",
   "返回边界卡": "Back to boundary card",
-  "沉淀为灰烬备忘录": "Distill into an ash memo",
+  "沉���为灰烬备忘录": "Distill into an ash memo",
   "继续��进": "Continue",
   "小步验证": "Validate small",
   "暂停": "Pause",
@@ -1426,7 +1429,7 @@ export const EXACT_DICT: Record<string, string> = {
   "主线回归": "Mainline recovery",
   "消费参照物": "Spending anchors",
   "待冷静决策": "In cooling-off",
-  "冷静期": "Cooling-off",
+  "��静期": "Cooling-off",
   "极高风险": "Critical risk",
   "待 GPT 审核": "Awaiting GPT review",
   "没有等待外部审核的支��。": "No spending awaiting external review.",
@@ -2049,7 +2052,7 @@ export const EXACT_DICT: Record<string, string> = {
   // ── 记录事件(/event-library/new) ──
   "场景属性": "Scene",
   "影响等级": "Impact level",
-  "几乎无影响": "Barely any impact",
+  "几乎无���响": "Barely any impact",
   "需要补救": "Needs remedy",
   "明显损失": "Clear loss",
   "是否重���": "Repeated?",

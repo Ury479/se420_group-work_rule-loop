@@ -8,6 +8,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // 仅无真实换算关联的隔离示例可公开评审；带入个人记录仍走完整登录校验。
+  if (pathname === "/spending-review/preview" && !request.nextUrl.searchParams.has("conversion")) {
+    return NextResponse.next()
+  }
+
   const isAuthPage = pathname === "/sign-in" || pathname === "/sign-up"
   const session = await auth.api.getSession({ headers: request.headers })
 

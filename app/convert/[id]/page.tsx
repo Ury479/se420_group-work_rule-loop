@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, ShieldCheck } from "lucide-react"
-import { getConversionDetail, getConversionPreferences } from "@/app/actions/spend-conversion"
+import { getConversionDetail } from "@/app/actions/spend-conversion"
 import { ConversionCooldownPanel } from "@/components/conversion-cooldown-panel"
 import { ConversionDetailActions } from "@/components/conversion-detail-actions"
 import { ConversionResolveForm } from "@/components/conversion-resolve-form"
@@ -28,12 +28,12 @@ export const metadata = { title: "换算结果 | 决策拦截台" }
 
 export default async function ConversionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const conversionId = Number.parseInt(id, 10)
-  if (!Number.isInteger(conversionId)) notFound()
+  const conversionId = Number(id)
+  if (!/^\d+$/.test(id) || !Number.isSafeInteger(conversionId) || conversionId <= 0) notFound()
 
-  const [detail, prefs] = await Promise.all([getConversionDetail(conversionId), getConversionPreferences()])
+  const detail = await getConversionDetail(conversionId)
   if (!detail) notFound()
-  const { conversion, snapshot } = detail
+  const { conversion, snapshot, prefs } = detail
 
   const stage = conversion.decisionStage as DecisionStage
   const resolution = conversion.resolution as Resolution | null
@@ -182,6 +182,15 @@ export default async function ConversionDetailPage({ params }: { params: Promise
           ) : null}
         </section>
       ) : null}
+
+      <section className="flex flex-col gap-3 rounded-xl border border-primary/35 bg-card p-5">
+        <h2 className="text-lg font-semibold">这笔投入，我想验证什么？</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">带上当时的金额与比较选项，留下一个期待。已有工具够用、先不买，也可以约一次回访。</p>
+        <Link href={`/spending-review/preview?conversion=${conversion.id}`} className="inline-flex min-h-11 w-fit items-center text-sm text-primary underline underline-offset-4">
+          带入这次换算，预览验证卡
+        </Link>
+        <p className="text-sm text-muted-foreground">隔离预览：不写入真实记录，不创建外部提醒。购买前冷静期与结果回访节点相互独立。</p>
+      </section>
 
       <ConversionDetailActions conversionId={conversion.id} ruleId={conversion.ruleId} />
     </main>
