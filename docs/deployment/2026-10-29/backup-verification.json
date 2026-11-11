@@ -1,0 +1,7 @@
+{
+  "backupRestore": true,
+  "restoredPublicTables": 63,
+  "runtimeSuperuser": false,
+  "runtimeBypassRLS": false,
+  "backupFile": "ruleloop-20261029T152644Z.dump"
+}

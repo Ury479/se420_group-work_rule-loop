@@ -1,0 +1,21 @@
+model:
+  default: "qwen3.5:2b-vps"
+  provider: custom
+  base_url: "http://review-ollama-host:11434/v1"
+  api_mode: chat_completions
+  context_length: 65536
+fallback_providers: []
+platform_toolsets:
+  api_server: []
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+logging:
+  level: WARNING
+agent:
+  reasoning_effort: "none"
+  max_turns: 2
+  max_tokens: 900
+gateway:
+  api_server:
+    max_concurrent_runs: 1

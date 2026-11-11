@@ -1,0 +1,20 @@
+
+> rule-loop@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.4 /Users/ury/Downloads/project/rule-loop
+
+(node:79486) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ tests/database.test.ts (125 tests) 674ms
+ ✓ tests/migrations.test.ts (1 test) 622ms
+   ✓ creates all 63 tables and replays versioned migrations without duplicates  621ms
+ ✓ tests/translation.test.ts (6 tests) 23ms
+ ✓ tests/domain.test.ts (19 tests) 18ms
+
+ Test Files  4 passed (4)
+      Tests  151 passed (151)
+   Start at  16:25:49
+   Duration  4.30s (transform 265ms, setup 54ms, collect 1.36s, tests 1.34s, environment 0ms, prepare 228ms)
+

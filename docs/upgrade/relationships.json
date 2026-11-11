@@ -1,0 +1,221 @@
+{
+  "relations": [
+    ["habit_papers", "habit_id", "habits", "cascade"],
+    ["habit_checkins", "habit_id", "habits", "cascade"],
+    ["habit_checkins", "paper_id", "habit_papers", "cascade"],
+    [
+      "confirmation_items",
+      "confirmation_id",
+      "critical_confirmations",
+      "cascade"
+    ],
+    [
+      "confirmation_evidence",
+      "confirmation_id",
+      "critical_confirmations",
+      "cascade"
+    ],
+    ["mistake_reviews", "confirmation_id", "critical_confirmations", "detach"],
+    ["confirmation_rules", "source_review_id", "mistake_reviews", "detach"],
+    [
+      "mind_regulation_reviews",
+      "session_id",
+      "mind_regulation_sessions",
+      "cascade"
+    ],
+    ["intervention_rule_versions", "rule_id", "confirmation_rules", "cascade"],
+    ["choice_validations", "trigger_session_id", "trigger_sessions", "cascade"],
+    ["ash_memos", "confirmation_id", "critical_confirmations", "detach"],
+    ["ash_memos", "linked_rule_id", "confirmation_rules", "detach"],
+    [
+      "relationship_interactions",
+      "relationship_id",
+      "relationships",
+      "cascade"
+    ],
+    ["relationship_reviews", "relationship_id", "relationships", "cascade"],
+    [
+      "relationship_emotional_states",
+      "relationship_id",
+      "relationships",
+      "cascade"
+    ],
+    ["relationship_signals", "relationship_id", "relationships", "cascade"],
+    [
+      "relationship_stage_snapshots",
+      "relationship_id",
+      "relationships",
+      "cascade"
+    ],
+    [
+      "relationship_communication_plans",
+      "relationship_id",
+      "relationships",
+      "cascade"
+    ],
+    [
+      "relationship_interaction_outcomes",
+      "relationship_id",
+      "relationships",
+      "cascade"
+    ],
+    [
+      "relationship_resource_assessments",
+      "relationship_id",
+      "relationships",
+      "cascade"
+    ],
+    [
+      "relationship_reviews",
+      "linked_confirmation_rule_id",
+      "confirmation_rules",
+      "detach"
+    ],
+    [
+      "relationship_interaction_outcomes",
+      "plan_id",
+      "relationship_communication_plans",
+      "cascade"
+    ],
+    [
+      "relationship_resource_assessments",
+      "resource_id",
+      "resources",
+      "cascade"
+    ],
+    ["key_results", "objective_id", "objectives", "cascade"],
+    ["tree_tasks", "parent_id", "tree_tasks", "cascade"],
+    ["tree_tasks", "root_id", "tree_tasks", "cascade"],
+    ["tree_tasks", "key_result_id", "key_results", "detach"],
+    ["tree_tasks", "objective_id", "objectives", "detach"],
+    ["boundary_checks", "boundary_id", "execution_boundaries", "cascade"],
+    ["unified_cards", "linked_card_id", "unified_cards", "detach"],
+    ["event_reviews", "event_id", "event_cases", "cascade"],
+    ["event_candidate_rules", "source_case_id", "event_cases", "detach"],
+    [
+      "tool_purchase_checks",
+      "spending_review_id",
+      "spending_reviews",
+      "cascade"
+    ],
+    [
+      "spending_review_exports",
+      "spending_review_id",
+      "spending_reviews",
+      "cascade"
+    ],
+    [
+      "external_review_results",
+      "spending_review_id",
+      "spending_reviews",
+      "cascade"
+    ],
+    [
+      "decision_recovery_actions",
+      "spending_review_id",
+      "spending_reviews",
+      "cascade"
+    ],
+    [
+      "spending_reviews_postmortem",
+      "spending_review_id",
+      "spending_reviews",
+      "cascade"
+    ],
+    ["resources", "platform_id", "resource_platforms", "detach"],
+    ["resource_evidence", "resource_id", "resources", "cascade"],
+    ["resource_links", "resource_id", "resources", "cascade"],
+    ["resource_reviews", "resource_id", "resources", "cascade"],
+    ["person_need_hypotheses", "person_id", "people_resources", "cascade"],
+    ["communication_plans", "person_id", "people_resources", "cascade"],
+    [
+      "communication_results",
+      "communication_plan_id",
+      "communication_plans",
+      "cascade"
+    ],
+    ["spend_conversions", "event_case_id", "event_cases", "detach"],
+    ["spend_conversions", "rule_id", "confirmation_rules", "detach"],
+    [
+      "entertainment_assessments",
+      "session_id",
+      "entertainment_sessions",
+      "cascade"
+    ],
+    [
+      "entertainment_reflections",
+      "session_id",
+      "entertainment_sessions",
+      "cascade"
+    ],
+    ["entertainment_reflections", "ash_memo_id", "ash_memos", "detach"],
+    [
+      "entertainment_reflections",
+      "confirmation_rule_id",
+      "confirmation_rules",
+      "detach"
+    ],
+    ["event_reviews", "linked_rule_id", "confirmation_rules"]
+  ],
+  "polymorphic": [
+    [
+      "unified_cards",
+      "context_id",
+      "context_type",
+      {
+        "boundary": "execution_boundaries",
+        "event": "event_cases",
+        "task": "tree_tasks"
+      },
+      "cascade"
+    ],
+    [
+      "confirmation_rules",
+      "source_id",
+      "source_type",
+      {
+        "ash_memo": "ash_memos",
+        "mistake_review": "mistake_reviews",
+        "mind_review": "mind_regulation_reviews"
+      },
+      "detach"
+    ],
+    [
+      "execution_boundaries",
+      "source_id",
+      "source_type",
+      {
+        "task": "tree_tasks",
+        "demand": "demands",
+        "relationship": "relationships",
+        "purchase": "spending_reviews"
+      },
+      "detach"
+    ],
+    [
+      "weakness_events",
+      "source_id",
+      "source_type",
+      {
+        "task": "tree_tasks",
+        "purchase": "spending_reviews",
+        "relationship": "relationships",
+        "review": "mistake_reviews",
+        "confirmation": "critical_confirmations",
+        "demand": "demands"
+      },
+      "detach"
+    ],
+    [
+      "resource_links",
+      "linked_id",
+      "linked_type",
+      {
+        "task": "tree_tasks",
+        "ash_memo": "ash_memos",
+        "okr": "objectives"
+      },
+      "detach"
+    ]
+  ]
+}

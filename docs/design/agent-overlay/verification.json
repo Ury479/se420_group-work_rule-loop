@@ -1,0 +1,25 @@
+{
+  "time": "2026-11-07T12:14:24.030Z",
+  "passed": 16,
+  "checks": [
+    "direct link opens the Agent below the fixed toolbar",
+    "original case text, root-cause selection and candidate status remain visible",
+    "original baseline keeps navigation and removes the proposed panel",
+    "enhancement expands in the existing event and preserves original review",
+    "source distinguishes quoted user review from proposed interpretation",
+    "empty draft cannot become an action card",
+    "editable draft survives refresh before adoption",
+    "timeout retains draft and does not retry or pretend success",
+    "unsupported free text is not portrayed as a successful AI match",
+    "not applicable keeps the rule and permits the user to make another choice",
+    "adoption creates one action card and does not imply execution",
+    "blank actual outcome does not create a review",
+    "actual outcome becomes a linked review card and unknown remains unknown",
+    "desktop and mobile layouts have no horizontal overflow",
+    "no browser exceptions or off-origin requests",
+    "all original source files still match the read-only render manifest"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "scope": "Static design and local browser interactions only; not production integration or Hermes acceptance"
+}

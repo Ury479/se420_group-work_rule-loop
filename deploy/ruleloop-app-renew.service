@@ -1,0 +1,6 @@
+[Unit]
+Description=Renew RuleLoop account application IP certificate
+After=docker.service nginx.service
+[Service]
+Type=oneshot
+ExecStart=/opt/ruleloop/current/deploy/operate.sh renew

@@ -1,0 +1,542 @@
+.workspace,
+.dialog {
+  color: var(--foreground);
+  font-size: 0.9375rem;
+}
+.workspace {
+  min-width: 0;
+}
+.workspace h1 {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 760;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+.workspace h2,
+.dialog h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.workspace p,
+.dialog p {
+  overflow-wrap: anywhere;
+}
+.workspace button,
+.dialog button,
+.back {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  text-align: center;
+}
+.workspace :is(button, a, select):focus-visible,
+.dialog :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.primary:enabled:hover {
+  background: var(--rl-ui-action-hover);
+}
+.secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+.secondary:enabled:hover {
+  background: color-mix(in oklab, var(--foreground) 8%, var(--secondary));
+}
+.quiet {
+  color: var(--muted-foreground);
+}
+.quiet:enabled:hover,
+.back:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+.danger {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+.dangerText {
+  color: var(--destructive);
+}
+.dangerText:enabled:hover {
+  background: color-mix(in oklab, var(--destructive) 10%, var(--card));
+}
+.back {
+  color: var(--foreground);
+  padding-inline: 4px;
+}
+.spread,
+.actions,
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.spread,
+.header {
+  justify-content: space-between;
+}
+.header {
+  margin: 8px 0 18px;
+  align-items: flex-end;
+}
+.header p {
+  color: var(--muted-foreground);
+  margin-top: 7px;
+}
+.muted,
+.context,
+.description {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+.heatmap,
+.track,
+.history ul {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+}
+.heatmap {
+  --checkin-empty: var(--muted);
+  --checkin-one: color-mix(in oklab, var(--success) 28%, var(--card));
+  --checkin-many: color-mix(in oklab, var(--success) 64%, var(--card));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+}
+.heatmap[data-empty="true"] {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+.heatmapControls {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.workspace select.heatmapFilter {
+  max-width: 100%;
+  min-height: 34px;
+  padding-block: 3px;
+  border-color: var(--input);
+  background: var(--background);
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+}
+.calendar {
+  --day-size: 15px;
+  --day-step: 18px;
+  position: relative;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  min-width: 0;
+}
+.calendarWeek {
+  display: grid;
+  grid-template-rows: repeat(7, var(--day-step)) 18px;
+  grid-template-columns: minmax(0, 1fr);
+}
+.workspace .calendarDay {
+  min-height: 0;
+  width: 100%;
+  padding: 0;
+  border-radius: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.calendarDay::before,
+.legend i {
+  content: "";
+  background: var(--checkin-empty);
+}
+.calendarDay::before {
+  width: min(var(--day-size), 100%);
+  height: var(--day-size);
+  border-radius: 4px;
+}
+.calendarDay[data-level="1"]::before,
+.legend i[data-level="1"] {
+  background: var(--checkin-one);
+}
+.calendarDay[data-level="2"]::before,
+.legend i[data-level="2"] {
+  background: var(--checkin-many);
+}
+.calendarDay:is([aria-current="date"], :hover, [data-highlighted="true"])::before {
+  box-shadow: inset 0 0 0 1px var(--ring);
+}
+.workspace .calendarDay:focus-visible {
+  outline: none;
+}
+.calendarDay:focus-visible::before {
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+.calendarMonth {
+  align-self: end;
+  width: max-content;
+  margin-inline-start: max(0px, calc((100% - var(--day-size)) / 2));
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  line-height: 1.25;
+}
+.calendarWeek:last-of-type .calendarMonth {
+  justify-self: end;
+  margin-inline-start: 0;
+}
+.calendarTooltip {
+  position: absolute;
+  z-index: 2;
+  left: clamp(5rem, var(--tooltip-x), calc(100% - 5rem));
+  top: calc(var(--day-step) * var(--tooltip-row) - 4px);
+  translate: -50% -100%;
+  width: 10rem;
+  max-width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 3px 10px var(--rl-ui-shadow);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+.calendarTooltip time {
+  display: block;
+  font-weight: 650;
+}
+.calendarTooltip[data-placement="below"] {
+  top: calc(var(--day-step) * (var(--tooltip-row) + 1) + 4px);
+  translate: -50% 0;
+}
+.calendarTooltip span {
+  color: color-mix(in oklab, var(--primary-foreground) 84%, var(--primary));
+}
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 1px;
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+}
+.legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+.tracks {
+  display: grid;
+  gap: 10px;
+  margin-top: 13px;
+}
+.track {
+  min-width: 0;
+  padding: 15px 18px;
+  display: grid;
+  grid-template-columns: minmax(122px, 0.85fr) minmax(0, 1.8fr) minmax(
+      148px,
+      0.8fr
+    );
+  gap: 9px 15px;
+  align-items: start;
+}
+.identity {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.trackName {
+  min-width: 0;
+}
+.icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--muted);
+  color: var(--foreground);
+}
+.trackContent {
+  min-width: 0;
+}
+.nextLabel {
+  font-size: 0.8125rem;
+  color: var(--foreground);
+  font-weight: 650;
+}
+.focus {
+  font-size: clamp(1rem, 2vw, 1.375rem);
+  font-weight: 720;
+  line-height: 1.4;
+  margin-block: 2px 4px;
+}
+.context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 7px;
+  align-items: baseline;
+}
+.context > * {
+  min-width: 0;
+}
+.trackTools {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 7px;
+  border-top: 1px solid var(--border);
+}
+.trackTools:empty {
+  display: none;
+}
+.paperPicker {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+.paperPicker select {
+  max-width: min(260px, 70vw);
+}
+.workspace select,
+.dialog :is(input, select, textarea) {
+  background: var(--background);
+  border: 1px solid var(--input);
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 6px 9px;
+  font-size: 0.875rem;
+  color: var(--foreground);
+}
+.breakpoint {
+  grid-column: 1 / -1;
+  padding: 10px 13px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--warning) 8%, var(--card));
+  border: 1px solid color-mix(in oklab, var(--warning) 34%, var(--border));
+}
+.breakpoint summary {
+  cursor: pointer;
+  color: var(--warning);
+  min-height: 30px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.breakpoint summary span + span {
+  margin-inline-start: 8px;
+  font-weight: 450;
+}
+.breakpoint dl {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.4fr) minmax(0, 1.6fr);
+  gap: 4px 10px;
+  margin-block: 8px;
+  font-size: 0.8125rem;
+}
+.breakpoint dt {
+  color: var(--muted-foreground);
+}
+.breakpoint dd {
+  overflow-wrap: anywhere;
+}
+.history {
+  margin-top: 20px;
+}
+.history .spread {
+  margin-bottom: 8px;
+}
+.history ul {
+  overflow: clip;
+}
+.history li {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 6px 12px;
+  padding: 10px 14px;
+}
+.history li + li {
+  border-top: 1px solid var(--border);
+}
+.history li > time {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+.history a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--foreground);
+  text-decoration: underline;
+  font-size: 0.8125rem;
+}
+.empty {
+  color: var(--muted-foreground);
+  padding-block: 10px;
+  font-size: 0.8125rem;
+}
+.error,
+.success {
+  font-size: 0.875rem;
+  margin-block: 5px;
+}
+.error {
+  color: var(--destructive);
+}
+.success {
+  color: var(--success);
+}
+.dialog {
+  background: var(--popover);
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  width: min(520px, calc(100% - 24px));
+  max-width: none;
+  gap: 8px;
+}
+.dialogTitle {
+  font-size: 1.25rem;
+  font-weight: 750;
+}
+.manageGroup ul {
+  border-block: 1px solid var(--border);
+}
+.manageGroup li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 7px;
+  padding-block: 4px;
+}
+.manageGroup li strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.manageGroup li + li {
+  border-top: 1px solid var(--border);
+}
+.manageGroup .spread {
+  margin-block: 5px;
+}
+.fields {
+  display: grid;
+  min-width: 0;
+  gap: 9px;
+}
+.fields label {
+  display: grid;
+  gap: 3px;
+  font-size: 0.875rem;
+  font-weight: 620;
+}
+.fields :is(input, select, textarea) {
+  width: 100%;
+}
+.fields textarea {
+  resize: vertical;
+  min-height: 57px;
+}
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+@media (min-width: 1024px) {
+  .overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 33rem);
+    align-items: center;
+    gap: 24px;
+    margin-top: 8px;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin: 0;
+  }
+}
+@media (max-width: 767px) {
+  .header {
+    margin: 4px 0 12px;
+  }
+  .header p {
+    margin-top: 4px;
+    font-size: 0.875rem;
+  }
+  .heatmap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+    padding: 9px 12px;
+  }
+  .heatmap h2 {
+    font-size: 1rem;
+  }
+  .heatmapControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .workspace select.heatmapFilter {
+    max-width: 53%;
+  }
+  .calendar {
+    --day-size: 13px;
+    --day-step: 15px;
+  }
+  .legend {
+    display: none;
+  }
+  .track {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 10px 12px;
+    gap: 7px;
+  }
+  .trackTools {
+    grid-column: auto;
+  }
+  .trackTools button {
+    padding-inline: 6px;
+    font-size: 0.8125rem;
+  }
+  .history li {
+    grid-template-columns: 77px minmax(0, 1fr);
+    padding-inline: 9px;
+  }
+  .dialog {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    translate: none;
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: max(15px, env(safe-area-inset-bottom));
+  }
+}

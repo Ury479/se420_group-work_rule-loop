@@ -1,0 +1,10 @@
+{
+  "sessionSurvivesRestart": true,
+  "taskSurvivesRestart": true,
+  "eventSurvivesRestart": true,
+  "ruleSurvivesRestart": true,
+  "apiWrite": true,
+  "accountIsolation": true,
+  "mobileNoHorizontalOverflow": true,
+  "browserErrors": []
+}

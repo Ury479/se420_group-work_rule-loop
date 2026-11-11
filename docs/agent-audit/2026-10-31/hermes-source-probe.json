@@ -1,0 +1,111 @@
+{
+  "scope": "Verified local files against recorded pinned Git blobs, then executed one extracted pure function; no complete-runtime or HTTP claim",
+  "inspectionCommit": "78077b2b8f83ac7d9293d3269df7ef20e3a9a994",
+  "deploymentVersionSelected": false,
+  "verifiedSourceFiles": [
+    {
+      "path": "gateway/platforms/api_server.py",
+      "gitBlobSha": "90b020e8c5bfa21f8ad254f94dea19b6a9c53122",
+      "sourceUrl": "https://github.com/NousResearch/hermes-agent/blob/78077b2b8f83ac7d9293d3269df7ef20e3a9a994/gateway/platforms/api_server.py"
+    },
+    {
+      "path": "gateway/platforms/api_server_authority_runs.py",
+      "gitBlobSha": "ef229d97453bb1635bcf5bd1871fe5288218de53",
+      "sourceUrl": "https://github.com/NousResearch/hermes-agent/blob/78077b2b8f83ac7d9293d3269df7ef20e3a9a994/gateway/platforms/api_server_authority_runs.py"
+    },
+    {
+      "path": "gateway/platforms/api_server_runs.py",
+      "gitBlobSha": "599812a11751ae3228b29bfcbe2701ec785c2b6e",
+      "sourceUrl": "https://github.com/NousResearch/hermes-agent/blob/78077b2b8f83ac7d9293d3269df7ef20e3a9a994/gateway/platforms/api_server_runs.py"
+    }
+  ],
+  "results": [
+    {
+      "case": "completed",
+      "input": {
+        "completed": true
+      },
+      "status": "completed",
+      "fields": {
+        "completed": true,
+        "partial": false,
+        "interrupted": false
+      }
+    },
+    {
+      "case": "partial_with_text",
+      "input": {
+        "partial": true,
+        "final_response": "some text"
+      },
+      "status": "failed",
+      "fields": {
+        "completed": false,
+        "partial": true,
+        "interrupted": false
+      }
+    },
+    {
+      "case": "explicit_failure",
+      "input": {
+        "failed": true
+      },
+      "status": "failed",
+      "fields": {
+        "completed": false,
+        "partial": false,
+        "interrupted": false
+      }
+    },
+    {
+      "case": "explicit_not_completed",
+      "input": {
+        "completed": false
+      },
+      "status": "failed",
+      "fields": {
+        "completed": false,
+        "partial": false,
+        "interrupted": false
+      }
+    },
+    {
+      "case": "iteration_budget",
+      "input": {
+        "partial": true,
+        "turn_exit_reason": "iteration_budget_exhausted"
+      },
+      "status": "failed",
+      "fields": {
+        "completed": false,
+        "partial": true,
+        "interrupted": false,
+        "turn_exit_reason": "iteration_budget_exhausted"
+      }
+    },
+    {
+      "case": "interrupted_with_text",
+      "input": {
+        "interrupted": true,
+        "final_response": "some text"
+      },
+      "status": "cancelled",
+      "fields": {
+        "completed": false,
+        "partial": false,
+        "interrupted": true
+      }
+    },
+    {
+      "case": "missing_completion_marker",
+      "input": {},
+      "status": "completed",
+      "fields": {
+        "completed": true,
+        "partial": false,
+        "interrupted": false
+      }
+    }
+  ],
+  "importantBoundary": "At this pinned source, the internal pure function treats an empty result as completed. RuleLoop must still require a valid run identity, authenticated terminal status, schema-valid output, sources and current business context before allowing adoption. Do not interpret an arbitrary empty API response as completion."
+}

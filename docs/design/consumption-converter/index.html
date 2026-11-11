@@ -1,0 +1,1447 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>RuleLoop · 消费价值换算设计详情</title>
+    <style>
+      :root {
+        --paper: #f2f6f5;
+        --surface: #ffffff;
+        --ink: #172623;
+        --muted: #60716c;
+        --cobalt: #3157c8;
+        --cobalt-deep: #2848aa;
+        --teal: #14786b;
+        --amber: #c77918;
+        --red: #b94743;
+        --wash: #e4ece9;
+        --trace: #a8b8b3;
+        --border: #cbd7d3;
+        --serif: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+        --sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        --mono: "SFMono-Regular", "Menlo", "Consolas", monospace;
+      }
+
+      * { box-sizing: border-box; }
+      html { background: #dce5e2; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: #dce5e2;
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      button, input { font: inherit; }
+      button { color: inherit; }
+
+      .design-note {
+        position: fixed;
+        z-index: 20;
+        top: 18px;
+        left: 20px;
+        max-width: 310px;
+        padding: 11px 14px;
+        border: 1px solid rgba(23, 38, 35, .16);
+        background: rgba(255, 255, 255, .92);
+        color: var(--muted);
+        font: 11px/1.55 var(--mono);
+        backdrop-filter: blur(12px);
+      }
+      .design-note strong { color: var(--ink); }
+
+      .gallery {
+        width: min(1960px, 100%);
+        margin: 0 auto;
+        padding: 56px 48px 80px;
+      }
+      .gallery-head {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: end;
+        gap: 48px;
+        margin: 0 0 40px;
+      }
+      .gallery-head h1 {
+        margin: 0;
+        font: 500 44px/1.12 var(--serif);
+        letter-spacing: -.045em;
+      }
+      .gallery-head p {
+        max-width: 670px;
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+      .gallery-meta {
+        color: var(--muted);
+        font: 11px/1.8 var(--mono);
+        text-align: right;
+      }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 390px);
+        align-items: start;
+        gap: 36px 28px;
+      }
+      .gallery-item { min-width: 0; }
+      .gallery-item.desktop-item { grid-column: 1 / -1; }
+      .gallery-label {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 0 10px;
+        color: #43534f;
+        font: 11px/1.4 var(--mono);
+      }
+      .gallery-label b { color: var(--ink); }
+
+      .mobile {
+        position: relative;
+        width: 390px;
+        height: 844px;
+        overflow: hidden;
+        background: var(--paper);
+        box-shadow: 0 20px 62px rgba(23, 38, 35, .16);
+      }
+      .screen {
+        min-height: 844px;
+        padding: 18px 20px 30px;
+      }
+      .topbar {
+        display: grid;
+        grid-template-columns: 44px 1fr 44px;
+        align-items: center;
+        min-height: 44px;
+      }
+      .topbar h1 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 650;
+        text-align: center;
+      }
+      .back, .quiet-icon {
+        display: grid;
+        width: 40px;
+        height: 40px;
+        place-items: center;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+      }
+      .back {
+        font: 24px/1 var(--serif);
+        justify-self: start;
+      }
+      .quiet-icon {
+        justify-self: end;
+        color: var(--muted);
+        font: 11px/1.2 var(--mono);
+      }
+      .save-state {
+        justify-self: end;
+        color: var(--teal);
+        font: 10px/1.2 var(--mono);
+      }
+      .save-state::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 5px;
+        border-radius: 50%;
+        background: var(--teal);
+      }
+
+      .eyebrow {
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 650;
+      }
+      .headline {
+        margin: 7px 0 0;
+        font: 500 28px/1.24 var(--serif);
+        letter-spacing: -.04em;
+        text-wrap: pretty;
+      }
+      .subcopy {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .field { margin-top: 25px; }
+      .field + .field { margin-top: 22px; }
+      .label-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 9px;
+      }
+      .field label {
+        font-size: 13px;
+        font-weight: 650;
+      }
+      .helper {
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .money-field {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        height: 76px;
+        border-bottom: 2px solid var(--ink);
+      }
+      .money-symbol {
+        align-self: end;
+        padding-bottom: 14px;
+        font: 500 26px/1 var(--serif);
+      }
+      .money-value {
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--ink);
+        font: 500 45px/1 var(--mono);
+        letter-spacing: -.065em;
+      }
+      .currency {
+        align-self: end;
+        padding-bottom: 15px;
+        color: var(--muted);
+        font: 10px/1 var(--mono);
+      }
+
+      .segmented {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .choice, .chip {
+        min-height: 44px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: transparent;
+      }
+      .choice {
+        position: relative;
+        padding: 11px 12px 11px 38px;
+        font-size: 12px;
+        text-align: left;
+      }
+      .choice::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        width: 12px;
+        height: 12px;
+        border: 1.5px solid var(--trace);
+        border-radius: 50%;
+        transform: translateY(-50%);
+      }
+      .choice.active {
+        border-color: var(--cobalt);
+        color: var(--cobalt);
+        background: rgba(49, 87, 200, .035);
+        font-weight: 650;
+      }
+      .choice.active::before {
+        border: 4px solid var(--cobalt);
+      }
+
+      .privacy-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 50px;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .privacy-row span:first-child {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .privacy-row b {
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .anchor-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      .anchor {
+        position: relative;
+        min-height: 68px;
+        padding: 12px 9px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: transparent;
+        text-align: left;
+      }
+      .anchor b {
+        display: block;
+        font-size: 11px;
+        line-height: 1.3;
+      }
+      .anchor span {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font: 9px/1 var(--mono);
+      }
+      .anchor.selected {
+        border-color: var(--cobalt);
+        box-shadow: inset 0 0 0 1px var(--cobalt);
+      }
+      .anchor.selected::after {
+        content: "✓";
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        color: var(--cobalt);
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .bottom-action {
+        position: absolute;
+        right: 20px;
+        bottom: 24px;
+        left: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        background: linear-gradient(to bottom, rgba(242, 246, 245, 0), var(--paper) 18%);
+      }
+      .primary, .secondary {
+        display: flex;
+        width: 100%;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 650;
+      }
+      .primary {
+        border: 1px solid var(--cobalt);
+        color: #fff;
+        background: var(--cobalt);
+      }
+      .secondary {
+        margin-top: 8px;
+        border: 1px solid var(--border);
+        background: transparent;
+      }
+      .bottom-note {
+        margin: 9px 0 0;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      .amount-hero {
+        margin-top: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--border);
+      }
+      .amount-hero small {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .amount-hero strong {
+        display: block;
+        margin-top: 4px;
+        font: 500 47px/1.12 var(--mono);
+        letter-spacing: -.065em;
+      }
+      .amount-hero p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .value-spine {
+        position: relative;
+        margin-top: 19px;
+      }
+      .value-spine::before {
+        content: "";
+        position: absolute;
+        top: 16px;
+        bottom: 16px;
+        left: 15px;
+        width: 1px;
+        background: var(--border);
+      }
+      .value-row {
+        position: relative;
+        display: grid;
+        grid-template-columns: 31px 1fr auto;
+        gap: 11px;
+        align-items: center;
+        min-height: 69px;
+        border-bottom: 1px solid rgba(203, 215, 211, .75);
+      }
+      .value-node {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        width: 31px;
+        height: 31px;
+        place-items: center;
+        border: 1.5px solid var(--cobalt);
+        border-radius: 50%;
+        background: var(--paper);
+        color: var(--cobalt);
+        font: 9px/1 var(--mono);
+      }
+      .value-node.square {
+        border-color: var(--teal);
+        border-radius: 3px;
+        color: var(--teal);
+      }
+      .value-node.diamond {
+        width: 24px;
+        height: 24px;
+        margin-left: 4px;
+        border-color: var(--amber);
+        border-radius: 2px;
+        color: var(--amber);
+        transform: rotate(45deg);
+      }
+      .value-node.diamond span { transform: rotate(-45deg); }
+      .value-copy b {
+        display: block;
+        font-size: 12px;
+      }
+      .value-copy span {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+        font: 9px/1.4 var(--mono);
+      }
+      .value-number {
+        text-align: right;
+      }
+      .value-number strong {
+        display: block;
+        font: 600 22px/1 var(--mono);
+        letter-spacing: -.04em;
+      }
+      .value-number span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 9px;
+      }
+      .snapshot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+        color: var(--muted);
+        font: 9px/1.4 var(--mono);
+      }
+      .snapshot b { color: var(--ink); font-weight: 500; }
+
+      .cooldown-panel {
+        position: relative;
+        margin-top: 28px;
+        padding: 26px 0 21px 56px;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .cooldown-ring {
+        position: absolute;
+        top: 27px;
+        left: 0;
+        display: grid;
+        width: 39px;
+        height: 39px;
+        place-items: center;
+        border: 2px solid var(--amber);
+        border-radius: 50%;
+        color: var(--amber);
+        font: 11px/1 var(--mono);
+      }
+      .cooldown-panel small {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .cooldown-panel strong {
+        display: block;
+        margin-top: 5px;
+        font: 500 31px/1.1 var(--mono);
+        letter-spacing: -.045em;
+      }
+      .cooldown-panel p {
+        margin: 7px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .progress {
+        height: 3px;
+        margin-top: 16px;
+        background: var(--wash);
+      }
+      .progress span {
+        display: block;
+        width: 36%;
+        height: 100%;
+        background: var(--amber);
+      }
+
+      .minimal-action {
+        margin-top: 24px;
+      }
+      .minimal-action h2,
+      .resolution h2,
+      .detail-section h2 {
+        margin: 0 0 11px;
+        font: 500 17px/1.4 var(--serif);
+      }
+      .action-line {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 10px;
+        align-items: center;
+        min-height: 52px;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .action-check {
+        display: grid;
+        width: 24px;
+        height: 24px;
+        place-items: center;
+        border: 1.5px solid var(--teal);
+        border-radius: 50%;
+        color: var(--teal);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .action-line b { font-size: 12px; }
+      .action-line p {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .resolution { margin-top: 24px; }
+      .resolution-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .resolution-card {
+        position: relative;
+        min-height: 86px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: transparent;
+        text-align: left;
+      }
+      .resolution-card b {
+        display: block;
+        font-size: 12px;
+      }
+      .resolution-card span {
+        display: block;
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.45;
+      }
+      .resolution-card.active {
+        border-color: var(--teal);
+        background: rgba(20, 120, 107, .035);
+        box-shadow: inset 0 0 0 1px var(--teal);
+      }
+      .resolution-card.active::after {
+        content: "✓";
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: var(--teal);
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .money-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        margin-top: 21px;
+        border-top: 2px solid var(--teal);
+        border-bottom: 1px solid var(--border);
+      }
+      .summary-cell {
+        padding: 14px 0;
+      }
+      .summary-cell + .summary-cell {
+        padding-left: 16px;
+        border-left: 1px solid var(--border);
+      }
+      .summary-cell span {
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .summary-cell strong {
+        display: block;
+        margin-top: 5px;
+        font: 600 23px/1 var(--mono);
+      }
+      .summary-cell strong.teal { color: var(--teal); }
+
+      .detail-banner {
+        margin-top: 23px;
+        padding-left: 16px;
+        border-left: 2px solid var(--teal);
+      }
+      .detail-banner small {
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .detail-banner h2 {
+        margin: 6px 0 0;
+        font: 500 25px/1.28 var(--serif);
+        letter-spacing: -.035em;
+      }
+      .detail-banner p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+      .detail-section { margin-top: 28px; }
+      .detail-row {
+        display: grid;
+        grid-template-columns: 108px 1fr;
+        gap: 14px;
+        min-height: 48px;
+        align-items: center;
+        border-top: 1px solid var(--border);
+      }
+      .detail-row:last-child { border-bottom: 1px solid var(--border); }
+      .detail-row span {
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .detail-row b {
+        font-size: 11px;
+        font-weight: 600;
+        text-align: right;
+      }
+      .trace-mini {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        margin-top: 26px;
+      }
+      .trace-mini-step {
+        position: relative;
+        padding-top: 26px;
+        color: var(--muted);
+        font-size: 9px;
+        text-align: center;
+      }
+      .trace-mini-step::before {
+        content: "";
+        position: absolute;
+        top: 9px;
+        right: 0;
+        left: 0;
+        height: 1px;
+        background: var(--border);
+      }
+      .trace-mini-step::after {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: 4px;
+        left: 50%;
+        width: 10px;
+        height: 10px;
+        border: 2px solid var(--teal);
+        border-radius: 50%;
+        background: var(--paper);
+        transform: translateX(-50%);
+      }
+      .trace-mini-step.current { color: var(--ink); font-weight: 650; }
+      .trace-mini-step.current::after {
+        border-color: var(--cobalt);
+        box-shadow: 0 0 0 4px rgba(49, 87, 200, .12);
+      }
+
+      .desktop {
+        display: grid;
+        grid-template-columns: 72px minmax(0, 1fr) 310px;
+        width: 1440px;
+        height: 900px;
+        overflow: hidden;
+        background: var(--paper);
+        box-shadow: 0 20px 70px rgba(23, 38, 35, .16);
+      }
+      .rail {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 22px 8px;
+        border-right: 1px solid var(--border);
+      }
+      .loop-mark {
+        position: relative;
+        width: 30px;
+        height: 18px;
+        margin-bottom: 28px;
+      }
+      .loop-mark::before,
+      .loop-mark::after {
+        content: "";
+        position: absolute;
+        top: 1px;
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--teal);
+        border-radius: 50%;
+      }
+      .loop-mark::before { left: 1px; }
+      .loop-mark::after { right: 1px; border-color: var(--cobalt); }
+      .rail-item {
+        display: grid;
+        width: 56px;
+        min-height: 58px;
+        margin-bottom: 5px;
+        place-items: center;
+        border-radius: 10px;
+        color: var(--muted);
+        font-size: 9px;
+      }
+      .rail-item b { font: 20px/1 var(--serif); }
+      .rail-item.active {
+        color: var(--cobalt);
+        background: rgba(49, 87, 200, .08);
+      }
+      .desktop-main {
+        padding: 34px 58px 48px;
+      }
+      .desktop-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+      .desktop-head h1 {
+        margin: 0;
+        font: 600 17px/1.2 var(--sans);
+      }
+      .desktop-head span {
+        color: var(--muted);
+        font: 10px/1 var(--mono);
+      }
+      .desktop-content {
+        display: grid;
+        grid-template-columns: 1.12fr .88fr;
+        gap: 62px;
+        max-width: 930px;
+        margin: 58px auto 0;
+      }
+      .desktop-hero {
+        padding-left: 22px;
+        border-left: 3px solid var(--cobalt);
+      }
+      .desktop-hero small {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .desktop-hero h2 {
+        margin: 9px 0 0;
+        font: 500 48px/1.1 var(--mono);
+        letter-spacing: -.065em;
+      }
+      .desktop-hero p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .desktop-values {
+        margin-top: 35px;
+        border-top: 1px solid var(--border);
+      }
+      .desktop-value {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        min-height: 76px;
+        border-bottom: 1px solid var(--border);
+      }
+      .desktop-value b {
+        display: block;
+        font-size: 13px;
+      }
+      .desktop-value small {
+        color: var(--muted);
+        font: 9px/1.5 var(--mono);
+      }
+      .desktop-value strong {
+        font: 600 26px/1 var(--mono);
+        letter-spacing: -.04em;
+      }
+      .decision-panel {
+        padding-top: 3px;
+      }
+      .decision-panel h3 {
+        margin: 0;
+        font: 500 25px/1.25 var(--serif);
+      }
+      .decision-panel > p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+      .time-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 25px;
+      }
+      .time-option {
+        min-height: 72px;
+        padding: 13px 10px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: transparent;
+        text-align: left;
+      }
+      .time-option b {
+        display: block;
+        font: 600 18px/1 var(--mono);
+      }
+      .time-option span {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 9px;
+      }
+      .time-option.active {
+        border-color: var(--amber);
+        color: var(--amber);
+        box-shadow: inset 0 0 0 1px var(--amber);
+      }
+      .desktop-action {
+        margin-top: 28px;
+        padding-top: 22px;
+        border-top: 1px solid var(--border);
+      }
+      .desktop-action label {
+        display: block;
+        margin-bottom: 9px;
+        font-size: 11px;
+        font-weight: 650;
+      }
+      .selected-action {
+        display: flex;
+        min-height: 52px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--surface);
+        font-size: 11px;
+      }
+      .selected-action b { color: var(--teal); }
+      .desktop-action .primary { margin-top: 12px; }
+
+      .context {
+        padding: 38px 30px;
+        border-left: 1px solid var(--border);
+      }
+      .context h2 {
+        margin: 0;
+        font: 500 19px/1.3 var(--serif);
+      }
+      .context-note {
+        margin: 8px 0 24px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.6;
+      }
+      .context-group {
+        margin-top: 25px;
+        padding-top: 19px;
+        border-top: 1px solid var(--border);
+      }
+      .context-group > span {
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 650;
+      }
+      .context-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+        font-size: 10px;
+      }
+      .context-row b {
+        font: 500 10px/1 var(--mono);
+      }
+      .context-rule {
+        margin-top: 25px;
+        padding: 15px 0 15px 15px;
+        border-left: 2px solid var(--teal);
+      }
+      .context-rule small {
+        color: var(--muted);
+        font-size: 9px;
+      }
+      .context-rule p {
+        margin: 7px 0 0;
+        font: 500 14px/1.65 var(--serif);
+      }
+      .privacy-badge {
+        display: inline-flex;
+        min-height: 28px;
+        margin-top: 24px;
+        padding: 0 10px;
+        align-items: center;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: 9px;
+      }
+
+      .variants {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 25px;
+      }
+      .variant {
+        min-height: 160px;
+        padding: 18px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+      .variant.recommended { border-top: 3px solid var(--cobalt); }
+      .variant small {
+        color: var(--muted);
+        font: 9px/1 var(--mono);
+      }
+      .variant h3 {
+        margin: 9px 0 0;
+        font: 500 18px/1.25 var(--serif);
+      }
+      .variant p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.55;
+      }
+      .variant-sketch {
+        display: grid;
+        grid-template-columns: 17px 1fr;
+        gap: 9px;
+        margin-top: 15px;
+      }
+      .sketch-line {
+        position: relative;
+        width: 1px;
+        height: 48px;
+        margin-left: 7px;
+        background: var(--border);
+      }
+      .sketch-line::before,
+      .sketch-line::after {
+        content: "";
+        position: absolute;
+        left: -4px;
+        width: 7px;
+        height: 7px;
+        border: 1px solid var(--cobalt);
+        border-radius: 50%;
+        background: #fff;
+      }
+      .sketch-line::before { top: 2px; }
+      .sketch-line::after { bottom: 2px; border-color: var(--teal); border-radius: 1px; }
+      .sketch-bars span {
+        display: block;
+        height: 5px;
+        margin: 4px 0 8px;
+        background: var(--wash);
+      }
+      .sketch-bars span:nth-child(1) { width: 92%; background: rgba(49, 87, 200, .22); }
+      .sketch-bars span:nth-child(2) { width: 71%; }
+      .sketch-bars span:nth-child(3) { width: 53%; }
+
+      body.single {
+        min-width: fit-content;
+        background: var(--paper);
+      }
+      body.single .design-note,
+      body.single .gallery-head,
+      body.single .gallery-label { display: none; }
+      body.single .gallery {
+        width: auto;
+        margin: 0;
+        padding: 0;
+      }
+      body.single .gallery-grid {
+        display: block;
+      }
+      body.single .gallery-item { display: none; }
+      body.single .gallery-item.active { display: block; }
+      body.single .mobile,
+      body.single .desktop { box-shadow: none; }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          scroll-behavior: auto !important;
+          transition-duration: .001ms !important;
+          animation-duration: .001ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      DESIGN SYSTEM DECLARATION
+      Type: serif conclusion / sans UI / mono money and metadata
+      Palette: Cold Paper + Deep Ink + one Cobalt action + semantic Teal/Amber
+      Rhythm: 20px mobile inset, 28–36px sections, 1px evidence rules
+      Signature: Value Spine — amount → equivalents → cooldown → evidence
+      Privacy: neutral labels in all overview states
+    -->
+    <div class="design-note">
+      <strong>RuleLoop / Value Spine</strong><br />
+      高保真设计画布 · 真实文案 · 本地隐私<br />
+      Query: <code>?view=input|result|cooldown|resolve|detail|desktop</code>
+    </div>
+
+    <main class="gallery">
+      <header class="gallery-head">
+        <div>
+          <h1>把金额变成一次可执行的暂停。</h1>
+          <p>
+            视觉不评价消费类别，只把计划金额、机会成本、冷静期和最终证据串成一条清晰轨迹。
+            默认隐藏敏感类别；“保护金额”与“实际转向”始终分开。
+          </p>
+        </div>
+        <div class="gallery-meta">
+          RULELOOP / CONSUMPTION CONVERTER<br />
+          MOBILE 390 × 844 · DESKTOP 1440 × 900<br />
+          VERSION 01 · 2026.07.29
+        </div>
+      </header>
+
+      <div class="gallery-grid">
+        <section class="gallery-item" data-view="input">
+          <div class="gallery-label"><b>01 / 输入</b><span>单一任务：把金额说清楚</span></div>
+          <article class="mobile">
+            <div class="screen">
+              <header class="topbar">
+                <button class="back" aria-label="返回">‹</button>
+                <h1>消费价值换算</h1>
+                <span class="save-state">本地</span>
+              </header>
+
+              <p class="eyebrow">先别判断，先把金额变得具体</p>
+              <h2 class="headline">你现在准备花多少钱？</h2>
+              <p class="subcopy">换算只用于理解机会成本，不会自动购买或转账。</p>
+
+              <div class="field">
+                <div class="label-row"><label for="amount">计划金额</label><span class="helper">最多两位小数</span></div>
+                <div class="money-field">
+                  <span class="money-symbol">¥</span>
+                  <input id="amount" class="money-value" value="8000" aria-label="计划金额 8000 元" />
+                  <span class="currency">CNY</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="label-row"><label>当前状态</label></div>
+                <div class="segmented">
+                  <button class="choice active">正在考虑</button>
+                  <button class="choice">已经发生</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="label-row"><label>隐私显示</label><span class="helper">首页只显示中性名称</span></div>
+                <div class="privacy-row"><span>记录名称</span><b>私密消费</b></div>
+              </div>
+
+              <div class="field">
+                <div class="label-row"><label>选择三个比较锚点</label><span class="helper">3 / 3</span></div>
+                <div class="anchor-grid">
+                  <button class="anchor selected"><b>Cursor Pro</b><span>¥140 / 月</span></button>
+                  <button class="anchor selected"><b>Claude Pro</b><span>¥119 / 月</span></button>
+                  <button class="anchor selected"><b>GPT Pro</b><span>¥700 / 月</span></button>
+                  <button class="anchor"><b>豆包高阶版</b><span>¥159 / 月</span></button>
+                  <button class="anchor"><b>Kimi</b><span>¥300 / 月</span></button>
+                  <button class="anchor"><b>日常餐食</b><span>¥40–60 / 顿</span></button>
+                </div>
+              </div>
+
+              <div class="bottom-action">
+                <button class="primary">查看机会成本</button>
+                <p class="bottom-note">价格与汇率会保存为本次快照</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="gallery-item" data-view="result">
+          <div class="gallery-label"><b>02 / 换算结果</b><span>单一任务：理解机会成本</span></div>
+          <article class="mobile">
+            <div class="screen">
+              <header class="topbar">
+                <button class="back" aria-label="返回">‹</button>
+                <h1>机会成本</h1>
+                <button class="quiet-icon">编辑</button>
+              </header>
+
+              <div class="amount-hero">
+                <small>计划消费</small>
+                <strong>¥8,000</strong>
+                <p>这不是“省下的钱”，而是你正在做的选择。</p>
+              </div>
+
+              <div class="value-spine" aria-label="换算结果">
+                <div class="value-row">
+                  <div class="value-node">C</div>
+                  <div class="value-copy"><b>Cursor Pro</b><span>USD 20 / 月 · ¥140</span></div>
+                  <div class="value-number"><strong>57.1</strong><span>个月</span></div>
+                </div>
+                <div class="value-row">
+                  <div class="value-node square">A</div>
+                  <div class="value-copy"><b>Claude Pro</b><span>USD 17 / 月 · ¥119</span></div>
+                  <div class="value-number"><strong>67.2</strong><span>个月</span></div>
+                </div>
+                <div class="value-row">
+                  <div class="value-node diamond"><span>G</span></div>
+                  <div class="value-copy"><b>GPT Pro</b><span>USD 100 / 月 · ¥700</span></div>
+                  <div class="value-number"><strong>11.4</strong><span>个月</span></div>
+                </div>
+              </div>
+
+              <div class="snapshot">
+                <span>价格快照 · 2026.07.29</span>
+                <b>USD/CNY 7.00</b>
+              </div>
+
+              <div class="field">
+                <div class="privacy-row">
+                  <span>换成日常餐食</span>
+                  <b>约 133–200 顿</b>
+                </div>
+              </div>
+
+              <div class="bottom-action">
+                <button class="primary">开始 2 小时冷静期</button>
+                <button class="secondary">不计时，稍后再决定</button>
+                <p class="bottom-note">等值只是比较单位，不是购买建议</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="gallery-item" data-view="cooldown">
+          <div class="gallery-label"><b>03 / 冷静期</b><span>单一任务：离开付款动作</span></div>
+          <article class="mobile">
+            <div class="screen">
+              <header class="topbar">
+                <button class="back" aria-label="返回">‹</button>
+                <h1>冷静期进行中</h1>
+                <span class="save-state">已保存</span>
+              </header>
+
+              <p class="eyebrow">付款决定已暂停</p>
+              <h2 class="headline">现在不用做最终决定。</h2>
+              <p class="subcopy">先完成一个能让你离开当前场景的最小行动。</p>
+
+              <section class="cooldown-panel">
+                <div class="cooldown-ring">36%</div>
+                <small>距离可以重新决定</small>
+                <strong>01:16:42</strong>
+                <p>今天 22:40 结束 · 应用关闭后仍会保留</p>
+                <div class="progress"><span></span></div>
+              </section>
+
+              <section class="minimal-action">
+                <h2>你选择的最小行动</h2>
+                <div class="action-line">
+                  <span class="action-check">✓</span>
+                  <div><b>关闭当前付款页面</b><p>已于 20:41 手动确认</p></div>
+                </div>
+              </section>
+
+              <section class="detail-section">
+                <h2>这次暂停保护什么</h2>
+                <div class="detail-row"><span>计划金额</span><b class="mono">¥8,000</b></div>
+                <div class="detail-row"><span>最清晰的锚点</span><b>67.2 个月 Claude Pro</b></div>
+                <div class="detail-row"><span>关联规则</span><b>高风险消费前先等待</b></div>
+              </section>
+
+              <div class="trace-mini" aria-label="消费换算流程">
+                <div class="trace-mini-step">已记录</div>
+                <div class="trace-mini-step current">冷静中</div>
+                <div class="trace-mini-step">待决定</div>
+                <div class="trace-mini-step">待证据</div>
+              </div>
+
+              <div class="bottom-action">
+                <button class="secondary">我已经做出决定</button>
+                <p class="bottom-note">提前记录不会被评判，但会保留实际时间</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="gallery-item" data-view="resolve">
+          <div class="gallery-label"><b>04 / 最终结果</b><span>单一任务：记录事实</span></div>
+          <article class="mobile">
+            <div class="screen">
+              <header class="topbar">
+                <button class="back" aria-label="返回">‹</button>
+                <h1>记录最终结果</h1>
+                <span class="save-state">本地</span>
+              </header>
+
+              <p class="eyebrow">冷静期已结束</p>
+              <h2 class="headline">最后发生了什么？</h2>
+              <p class="subcopy">这里只记录事实。“没有消费”不等于钱已经转入了目标预算。</p>
+
+              <section class="resolution">
+                <h2>消费结果</h2>
+                <div class="resolution-grid">
+                  <button class="resolution-card active"><b>已放弃</b><span>这笔计划消费没有发生</span></button>
+                  <button class="resolution-card"><b>部分消费</b><span>填写最后实际支付金额</span></button>
+                  <button class="resolution-card"><b>已消费</b><span>记录事实，进入后续复盘</span></button>
+                  <button class="resolution-card"><b>暂不记录</b><span>稍后仍可回来完成</span></button>
+                </div>
+              </section>
+
+              <div class="money-summary">
+                <div class="summary-cell"><span>保护金额</span><strong class="teal">¥8,000</strong></div>
+                <div class="summary-cell"><span>实际转向</span><strong>¥0</strong></div>
+              </div>
+
+              <div class="field">
+                <div class="label-row"><label>是否已转入目标预算？</label><span class="helper">可选</span></div>
+                <div class="privacy-row"><span>实际转入金额</span><b class="mono">¥0</b></div>
+                <p class="subcopy">只有真实完成的资金动作才计入“实际转向”。</p>
+              </div>
+
+              <div class="bottom-action">
+                <button class="primary">保存结果并记录验证</button>
+                <p class="bottom-note">将关联“高风险消费前先等待”规则</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="gallery-item" data-view="detail">
+          <div class="gallery-label"><b>05 / 历史详情</b><span>单一任务：查看证据</span></div>
+          <article class="mobile">
+            <div class="screen">
+              <header class="topbar">
+                <button class="back" aria-label="返回">‹</button>
+                <h1>私密消费换算</h1>
+                <button class="quiet-icon">•••</button>
+              </header>
+
+              <div class="detail-banner">
+                <small>2026.07.29 · 已完成</small>
+                <h2>暂停后，这笔计划消费没有发生。</h2>
+                <p>保护金额是未发生的计划支出；实际转向仍需单独确认。</p>
+              </div>
+
+              <div class="money-summary">
+                <div class="summary-cell"><span>保护金额</span><strong class="teal">¥8,000</strong></div>
+                <div class="summary-cell"><span>实际转向</span><strong>¥0</strong></div>
+              </div>
+
+              <section class="detail-section">
+                <h2>决定轨迹</h2>
+                <div class="detail-row"><span>开始考虑</span><b class="mono">20:40</b></div>
+                <div class="detail-row"><span>冷静期</span><b>2 小时 · 已完成</b></div>
+                <div class="detail-row"><span>最小行动</span><b>关闭付款页面</b></div>
+                <div class="detail-row"><span>最终结果</span><b>已放弃</b></div>
+              </section>
+
+              <section class="detail-section">
+                <h2>当时看到的机会成本</h2>
+                <div class="detail-row"><span>Cursor Pro</span><b>57.1 个月</b></div>
+                <div class="detail-row"><span>Claude Pro</span><b>67.2 个月</b></div>
+                <div class="detail-row"><span>GPT Pro</span><b>11.4 个月</b></div>
+              </section>
+
+              <section class="detail-section">
+                <h2>价格快照</h2>
+                <div class="detail-row"><span>汇率</span><b class="mono">USD/CNY 7.00</b></div>
+                <div class="detail-row"><span>隐私模式</span><b>中性名称</b></div>
+              </section>
+
+              <div class="bottom-action">
+                <button class="secondary">查看关联规则</button>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="gallery-item desktop-item" data-view="desktop">
+          <div class="gallery-label"><b>06 / Desktop 详情</b><span>主决策 + 价格快照上下文</span></div>
+          <article class="desktop">
+            <nav class="rail" aria-label="主导航">
+              <div class="loop-mark" aria-label="RuleLoop"></div>
+              <div class="rail-item"><b>⌂</b><span>首页</span></div>
+              <div class="rail-item"><b>◇</b><span>复盘</span></div>
+              <div class="rail-item active"><b>＋</b><span>换算</span></div>
+              <div class="rail-item"><b>□</b><span>规则</span></div>
+              <div class="rail-item"><b>▱</b><span>档案</span></div>
+            </nav>
+
+            <main class="desktop-main">
+              <header class="desktop-head">
+                <h1>消费价值换算</h1>
+                <span>2026.07.29 / LOCAL ONLY</span>
+              </header>
+
+              <div class="desktop-content">
+                <section>
+                  <div class="desktop-hero">
+                    <small>正在考虑的消费</small>
+                    <h2>¥8,000</h2>
+                    <p>先理解机会成本，再决定是否支付。</p>
+                  </div>
+
+                  <div class="desktop-values">
+                    <div class="desktop-value">
+                      <div><b>Claude Pro</b><small>USD 17 / 月 · ¥119</small></div>
+                      <strong>67.2 月</strong>
+                    </div>
+                    <div class="desktop-value">
+                      <div><b>Cursor Pro</b><small>USD 20 / 月 · ¥140</small></div>
+                      <strong>57.1 月</strong>
+                    </div>
+                    <div class="desktop-value">
+                      <div><b>GPT Pro</b><small>USD 100 / 月 · ¥700</small></div>
+                      <strong>11.4 月</strong>
+                    </div>
+                  </div>
+                  <div class="snapshot"><span>价格与汇率来自本次快照</span><b>完整结果与余额 ›</b></div>
+                </section>
+
+                <section class="decision-panel">
+                  <h3>给决定留一点距离。</h3>
+                  <p>冷静期不会替你决定，只把“现在必须付款”的感觉从行动里分离出来。</p>
+
+                  <div class="time-options">
+                    <button class="time-option"><b>15m</b><span>短暂停</span></button>
+                    <button class="time-option active"><b>2h</b><span>推荐</span></button>
+                    <button class="time-option"><b>24h</b><span>高金额</span></button>
+                  </div>
+
+                  <div class="desktop-action">
+                    <label>最小行动</label>
+                    <div class="selected-action"><span>关闭当前付款页面</span><b>已选择</b></div>
+                    <button class="primary">开始 2 小时冷静期</button>
+                    <p class="bottom-note">等值只是比较单位，不是购买建议</p>
+                  </div>
+                </section>
+              </div>
+            </main>
+
+            <aside class="context">
+              <h2>本次换算</h2>
+              <p class="context-note">敏感类别已隐藏。数据只保存在本机。</p>
+
+              <div class="context-group">
+                <span>价格快照</span>
+                <div class="context-row"><span>USD/CNY</span><b>7.000000</b></div>
+                <div class="context-row"><span>Cursor Pro</span><b>¥140 / 月</b></div>
+                <div class="context-row"><span>Claude Pro</span><b>¥119 / 月</b></div>
+                <div class="context-row"><span>GPT Pro</span><b>¥700 / 月</b></div>
+              </div>
+
+              <div class="context-group">
+                <span>计算口径</span>
+                <div class="context-row"><span>完整 Cursor 月数</span><b>57</b></div>
+                <div class="context-row"><span>剩余金额</span><b>¥20</b></div>
+                <div class="context-row"><span>日常餐食</span><b>133–200 顿</b></div>
+              </div>
+
+              <div class="context-rule">
+                <small>关联规则</small>
+                <p>高风险消费前先换算，并等待至少 2 小时。</p>
+              </div>
+
+              <span class="privacy-badge">中性显示 · 本地数据</span>
+            </aside>
+          </article>
+        </section>
+
+        <section class="gallery-item desktop-item" data-view="variants">
+          <div class="gallery-label"><b>结果页层级比较</b><span>保守 → 推荐 → 数据密集</span></div>
+          <div class="variants">
+            <article class="variant">
+              <small>OPTION A / LIST</small>
+              <h3>平铺清单</h3>
+              <p>最接近普通账单，学习成本最低；但机会成本与冷静期之间的关系偏弱。</p>
+              <div class="variant-sketch"><div class="sketch-line"></div><div class="sketch-bars"><span></span><span></span><span></span></div></div>
+            </article>
+            <article class="variant recommended">
+              <small>OPTION B / VALUE SPINE · RECOMMENDED</small>
+              <h3>价值轨迹</h3>
+              <p>沿用 RuleLoop 的 Loop Spine，把金额、换算、冷静期和证据连成同一产品语言。</p>
+              <div class="variant-sketch"><div class="sketch-line"></div><div class="sketch-bars"><span></span><span></span><span></span></div></div>
+            </article>
+            <article class="variant">
+              <small>OPTION C / LEDGER</small>
+              <h3>预算台账</h3>
+              <p>适合重度数据用户，可显示完整余额与组合；手机端容易把产品变成财务面板。</p>
+              <div class="variant-sketch"><div class="sketch-line"></div><div class="sketch-bars"><span></span><span></span><span></span></div></div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const view = params.get("view");
+      if (view) {
+        document.body.classList.add("single");
+        const target = document.querySelector(`[data-view="${view}"]`);
+        if (target) target.classList.add("active");
+      }
+
+      document.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (button.classList.contains("anchor")) {
+            button.classList.toggle("selected");
+          }
+          if (button.classList.contains("choice")) {
+            button.parentElement.querySelectorAll(".choice").forEach((item) => item.classList.remove("active"));
+            button.classList.add("active");
+          }
+          if (button.classList.contains("resolution-card")) {
+            button.parentElement.querySelectorAll(".resolution-card").forEach((item) => item.classList.remove("active"));
+            button.classList.add("active");
+          }
+          if (button.classList.contains("time-option")) {
+            button.parentElement.querySelectorAll(".time-option").forEach((item) => item.classList.remove("active"));
+            button.classList.add("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

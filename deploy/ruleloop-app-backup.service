@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up RuleLoop account database
+After=docker.service
+Requires=docker.service
+[Service]
+Type=oneshot
+ExecStart=/opt/ruleloop/current/deploy/operate.sh backup

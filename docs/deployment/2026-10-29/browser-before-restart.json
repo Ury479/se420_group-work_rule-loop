@@ -1,0 +1,11 @@
+{
+  "registration": true,
+  "login": true,
+  "wrongPasswordRejected": true,
+  "logout": true,
+  "secureCookies": true,
+  "taskSaveReload": true,
+  "eventReviewRule": true,
+  "modulePages": 21,
+  "browserErrors": []
+}

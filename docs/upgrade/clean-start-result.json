@@ -1,0 +1,7 @@
+{
+  "cleanInstall": true,
+  "cleanBuild": true,
+  "loginStatus": 200,
+  "persistedRecordStatus": 200,
+  "persistedRecordVisible": true
+}

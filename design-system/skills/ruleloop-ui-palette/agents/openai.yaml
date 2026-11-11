@@ -1,0 +1,4 @@
+interface:
+  display_name: "RuleLoop UI 配色"
+  short_description: "Apply Stone and Indigo to an existing RuleLoop UI"
+  default_prompt: "使用 $ruleloop-ui-palette 覆盖 RuleLoop 指定页面的配色，默认石白，可切换靛夜。"

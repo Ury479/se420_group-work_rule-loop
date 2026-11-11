@@ -1,0 +1,44 @@
+{
+  "scope": "Actual copied migration function and trigger in isolated PostgreSQL single-user mode; not production or full application acceptance",
+  "checks": [
+    {
+      "case": "current_event_page_namespace",
+      "result": "rejected_23503",
+      "detail": "Unsupported internal reference"
+    },
+    {
+      "case": "canonical_event_namespace",
+      "result": "accepted",
+      "detail": null
+    },
+    {
+      "case": "foreign_account_event",
+      "result": "rejected_23503",
+      "detail": "Referenced record does not belong to account"
+    },
+    {
+      "case": "missing_event",
+      "result": "rejected_23503",
+      "detail": "Referenced record does not belong to account"
+    },
+    {
+      "case": "existing_boundary_namespace",
+      "result": "accepted",
+      "detail": null
+    },
+    {
+      "case": "existing_task_namespace",
+      "result": "accepted",
+      "detail": null
+    }
+  ],
+  "sourceHashes": {
+    "drizzle/0001_account_integrity.sql": "b3bb7871377f579a16cd040a2c0caf516f80d0f8e32824cfcd92833b28a479c8",
+    "src/app/event-library/[id]/page.tsx": "e48e056e8228508c0c4f8cc162b627f0399559e214905d8a4dd64fc0f103e6ba"
+  },
+  "productionFilesModified": false,
+  "proposedPatchApplied": false,
+  "existingClusterRestarted": false,
+  "temporaryClusterRemoved": true,
+  "postgresVersion": "postgres (PostgreSQL) 17.9 (Homebrew)"
+}

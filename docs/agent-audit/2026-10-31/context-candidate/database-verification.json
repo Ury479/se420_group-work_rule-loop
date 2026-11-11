@@ -1,0 +1,15 @@
+{
+  "scope": "Candidate context loader against actual RuleLoop migrations and account transaction/RLS; synthetic users, test auth identity, SELECT-only runtime; not browser session or Hermes acceptance",
+  "passed": 66,
+  "failed": 0,
+  "typecheck": true,
+  "migrationHashes": {
+    "0000_initial_online_schema.sql": "b8dacf0ae3e20e66a3b1d1d79008965fd37e78135ba714d6271594c148699f64",
+    "0001_account_integrity.sql": "b3bb7871377f579a16cd040a2c0caf516f80d0f8e32824cfcd92833b28a479c8",
+    "0002_agent_rule_sources.sql": "51123f5a70eb5b31fb01a261209013230b4c25a97970d76aa46ef8b3f90fc9ac"
+  },
+  "productionDatabaseAccess": false,
+  "modelCalls": 0,
+  "productionPatchApplied": false,
+  "temporaryClusterCleanup": "completed after tests by finally"
+}

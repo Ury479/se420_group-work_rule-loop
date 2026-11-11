@@ -1,0 +1,35 @@
+{
+  "scope": "Current pure matcher on synthetic fixtures; not semantic applicability validation",
+  "results": [
+    {
+      "name": "same_domain_without_condition",
+      "input": {
+        "sceneType": "study",
+        "summary": "提前两周准备新课程阅读"
+      },
+      "matchedIds": [
+        1
+      ],
+      "meaning": "Current matcher recalls same-domain rule without establishing its trigger condition."
+    },
+    {
+      "name": "paused_rule_excluded",
+      "input": {
+        "sceneType": "study",
+        "summary": "作业即将截止"
+      },
+      "matchedIds": [],
+      "meaning": "Paused rules remain excluded; AI retrieval must retain this constraint."
+    },
+    {
+      "name": "no_same_domain_or_keyword",
+      "input": {
+        "sceneType": "relationship",
+        "summary": "安排朋友见面"
+      },
+      "matchedIds": [],
+      "meaning": "No retrieval candidate is valid; do not fabricate a matching personal lesson."
+    }
+  ],
+  "conclusion": "Use existing match results as retrieval candidates. Source validity and trigger/applicability conditions require separate checks before advice."
+}
