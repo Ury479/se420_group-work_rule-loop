@@ -20,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { saveNavOrder } from "@/app/actions/preferences";
+import { ThemeCycleButton } from "@/components/theme-cycle-button";
 import { cn } from "@/lib/utils";
 
 const primaryLinks = [
@@ -189,9 +190,16 @@ export function AppNav({ navOrder = null }: { navOrder?: string[] | null }) {
             },
           )}
         </nav>
+        <div className="shrink-0 border-t border-sidebar-border p-3">
+          <ThemeCycleButton />
+        </div>
       </aside>
 
       {!isFocusedMobilePage ? (
+        <>
+          <div className="fixed right-4 top-4 z-50 lg:hidden">
+            <ThemeCycleButton />
+          </div>
         <nav
           aria-label="底部导航"
           className="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm lg:hidden"
@@ -246,6 +254,7 @@ export function AppNav({ navOrder = null }: { navOrder?: string[] | null }) {
             })}
           </div>
         </nav>
+        </>
       ) : null}
     </>
   );

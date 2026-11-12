@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "../../design-system/skills/ruleloop-ui-palette/assets/palette.css";
 
-@custom-variant dark (&:where([data-ruleloop-palette="indigo"], [data-ruleloop-palette="indigo"] *));
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);

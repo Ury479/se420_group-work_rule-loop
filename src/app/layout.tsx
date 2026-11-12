@@ -1,15 +1,10 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
-import { cookies } from "next/headers";
-import { PaletteProvider } from "@/components/appearance-settings";
 import { AppShell } from "@/components/app-shell";
 import { TranslatorProvider } from "@/components/page-translator";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeScript } from "@/components/theme-script";
 import { getNavOrder } from "@/app/actions/preferences";
-import {
-  RULELOOP_PALETTE_COOKIE,
-  RULELOOP_PALETTES,
-  parseRuleLoopPalette,
-} from "@/lib/ruleloop-palette";
 import "./globals.css";
 import "./fonts.css";
 
@@ -19,37 +14,30 @@ export const metadata: Metadata = {
   generator: "v0.app",
 };
 
-async function getPalette() {
-  return parseRuleLoopPalette(
-    (await cookies()).get(RULELOOP_PALETTE_COOKIE)?.value,
-  );
-}
-
-export async function generateViewport(): Promise<Viewport> {
-  const { themeColor, colorScheme } = RULELOOP_PALETTES[await getPalette()];
-  return { themeColor, colorScheme, userScalable: true };
-}
+export const viewport: Viewport = {
+  themeColor: "#1d1d1f",
+  colorScheme: "light dark",
+  userScalable: true,
+};
 
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [navOrder, palette] = await Promise.all([getNavOrder(), getPalette()]);
+  const navOrder = await getNavOrder();
   return (
-    <html
-      lang="zh-CN"
-      data-ruleloop-palette={palette}
-      className="bg-background"
-      suppressHydrationWarning
-    >
+    <html lang="zh-CN" className="bg-background" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body
         suppressHydrationWarning
         className="min-h-dvh bg-background font-sans text-foreground antialiased"
       >
-        <TranslatorProvider>
-          <PaletteProvider initialPalette={palette}>
+        <ThemeProvider>
+          <TranslatorProvider>
             <AppShell navOrder={navOrder}>{children}</AppShell>
-          </PaletteProvider>
-        </TranslatorProvider>
+          </TranslatorProvider>
+        </ThemeProvider>
         {process.env.ENABLE_ANALYTICS === "true" ? <Analytics /> : null}
       </body>
     </html>

@@ -5,7 +5,7 @@ import { getEntropyConfig } from "@/app/actions/lifespan";
 import { SettingsPanel } from "@/components/settings-panel";
 import { EntropySettings } from "@/components/entropy-settings";
 import { AccountSettings } from "@/components/account-settings";
-import { AppearanceSettings } from "@/components/appearance-settings";
+import { ThemeSettings } from "@/components/theme-settings";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -58,7 +58,7 @@ export default async function SettingsPage() {
       </header>
       <div className="mt-6 flex flex-col gap-6">
         <AccountSettings email={session.user.email} />
-        <AppearanceSettings />
+        <ThemeSettings />
         <section
           id="modules"
           aria-labelledby="modules-title"
