@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>决策拦截台 · RuleLoop 设计预览</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f5ef; --surface: #fffefa; --ink: #192722; --muted: #54645c;
+      --line: #dce3d9; --brand: #174d3c; --mint: #e6efe5; --soft: #f6f8f3;
+      --amber: #774b12; --amber-bg: #f9efd9; --red: #923e30; --red-bg: #f9eae4;
+      font-family: "Instrument Sans", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      color: var(--ink); background: var(--bg); font-size: 15px; line-height: 1.55;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    h1, h2, h3, p, dl, dd { margin: 0; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: default; opacity: .5; }
+    :focus-visible { outline: 3px solid #397357; outline-offset: 3px; }
+    .icon { width: 18px; height: 18px; flex: none; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .shell { width: min(1160px, calc(100% - 80px)); margin-inline: auto; }
+    .top { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .top-inner { min-height: 68px; display: flex; align-items: center; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 9px; font-size: 19px; font-weight: 760; letter-spacing: -.045em; }
+    .brand-mark { display: grid; place-items: center; width: 33px; height: 33px; background: var(--brand); color: white; border-radius: 11px; }
+    .brand-mark .icon { width: 21px; height: 21px; }
+    .crumb { border-left: 1px solid var(--line); padding-left: 20px; color: var(--muted); font-size: 13px; }
+    .preview { margin-left: auto; color: var(--muted); border: 1px solid var(--line); padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+    main { padding-block: 35px 48px; }
+    .intro { margin-bottom: 25px; }
+    h1 { font-size: clamp(30px, 4vw, 44px); line-height: 1.18; letter-spacing: -.055em; font-weight: 720; }
+    .intro p { color: var(--muted); margin-top: 9px; }
+    .queue-jump { display: none; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.73fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 2px 3px #1c332406; min-width: 0; overflow: clip; }
+    .panel-head { padding: 23px 25px 19px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { min-width: 0; overflow-wrap: anywhere; font-size: 21px; font-weight: 700; letter-spacing: -.035em; }
+    .panel-head .action { flex: none; }
+    .tile { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: var(--mint); color: var(--brand); flex: none; }
+    .action { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 14px; border-radius: 10px; border: 1px solid transparent; background: transparent; font-size: 14px; font-weight: 650; text-decoration: none; }
+    .quiet { color: var(--brand); }
+    .quiet:hover { background: var(--mint); }
+    .primary { color: #fff; background: var(--brand); }
+    .primary:hover { background: #103d2f; }
+    .outline { border-color: var(--line); background: var(--surface); }
+    .outline:hover { background: var(--soft); border-color: #a5b6a9; }
+    .push { margin-left: auto; }
+    form, .detail { padding: 22px 25px 24px; }
+    .fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+    .wide { grid-column: 1 / -1; }
+    .field { display: grid; gap: 6px; align-content: start; min-width: 0; }
+    label, legend { font-weight: 630; font-size: 14px; }
+    .optional { font-weight: 400; color: var(--muted); margin-left: 5px; font-size: 12px; }
+    input:not([type=radio], [type=checkbox]), select, textarea {
+      border: 1px solid #cbd6ca; border-radius: 9px; background: #fffefa; min-width: 0;
+      width: 100%; min-height: 44px; padding: 9px 12px;
+    }
+    textarea { min-height: 86px; resize: vertical; }
+    ::placeholder { color: #647269; opacity: 1; }
+    .amount { display: grid; grid-template-columns: minmax(0, 1fr) 82px; gap: 7px; }
+    .extra { margin-top: 16px; border: 1px solid var(--line); border-radius: 10px; }
+    .extra summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 7px; min-height: 44px; padding: 10px 12px; font-size: 14px; font-weight: 620; }
+    .extra summary::-webkit-details-marker { display: none; }
+    .extra[open] summary .chevron { transform: rotate(90deg); }
+    .extra .fields { padding: 3px 13px 14px; }
+    .submit { display: flex; align-items: center; justify-content: space-between; gap: 13px; margin-top: 19px; }
+    .submit p { max-width: 290px; color: var(--muted); font-size: 12px; }
+    .submit button { flex: none; }
+    .error { color: var(--red); margin-top: 12px; font-size: 13px; }
+    .error:empty { display: none; }
+    .side-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 21px 20px 14px; }
+    .side-head h2 { font-size: 18px; letter-spacing: -.025em; }
+    .tabs { display: flex; gap: 3px; padding: 3px; background: #edf1e9; border-radius: 9px; }
+    .tabs button { font-size: 12px; padding: 5px 8px; min-height: 35px; border-radius: 7px; background: transparent; color: var(--muted); border: 1px solid transparent; white-space: nowrap; }
+    .tabs button[aria-pressed=true] { background: var(--surface); color: var(--brand); border-color: var(--line); font-weight: 700; }
+    .rows { display: grid; padding: 0 13px 10px; }
+    .record { min-width: 0; width: 100%; text-align: left; background: transparent; border: 1px solid transparent; border-top-color: var(--line); padding: 14px 8px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+    .record:hover, .record[aria-current=true] { background: var(--soft); }
+    .record .tile { width: 34px; height: 34px; border-radius: 9px; }
+    .record .tile .icon { width: 16px; height: 16px; }
+    .record-title { display: block; font-weight: 670; overflow-wrap: anywhere; }
+    .record-sub, .record .chevron { color: var(--muted); font-size: 12px; }
+    .record .chevron { width: 15px; height: 15px; }
+    .badge { display: inline-flex; align-items: center; width: fit-content; font-size: 12px; font-weight: 630; padding: 3px 7px; background: var(--mint); color: var(--brand); border-radius: 5px; white-space: nowrap; }
+    .badge.cooling, .tile.cooling { color: var(--amber); background: var(--amber-bg); }
+    .badge.failed, .tile.failed { color: var(--red); background: var(--red-bg); }
+    .badge.done { background: #edf0eb; color: var(--muted); }
+    .flow { padding: 18px 20px; border-top: 1px solid var(--line); background: var(--soft); }
+    .flow h3 { font-size: 14px; font-weight: 700; }
+    .flow ol { padding: 0; margin: 12px 0 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .flow li { font-size: 12px; font-weight: 630; color: var(--muted); border-top: 2px solid #a8bbae; padding-top: 6px; }
+    .flow li[aria-current=step] { border-color: #4b7d64; color: var(--brand); }
+    .empty { border-top: 1px solid var(--line); color: var(--muted); padding: 18px 8px; font-size: 14px; }
+    .detail { display: grid; gap: 18px; }
+    .detail h3 { font-size: 16px; }
+    .detail p { color: var(--muted); overflow-wrap: anywhere; }
+    .detail .amount-label { color: var(--ink); font-size: clamp(28px, 3vw, 39px); font-weight: 720; font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+    .overview { display: flex; align-items: start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .notice { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 15px; background: var(--soft); }
+    .notice.failed { border-color: #efd6cc; background: #fcf4ee; }
+    .notice.cooling { border-color: #eadbc0; background: #fcf7ec; }
+    .notice .action { justify-self: start; }
+    .report { display: grid; gap: 10px; }
+    .report dt { font-weight: 700; font-size: 13px; }
+    .report dd { color: var(--muted); font-size: 14px; }
+    .decision { display: grid; gap: 10px; border-top: 1px solid var(--line); padding: 18px 0 0; margin: 0; }
+    fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
+    .options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 7px; }
+    .option { display: flex; align-items: center; gap: 5px; border: 1px solid var(--line); border-radius: 9px; padding: 7px 9px; min-height: 44px; font-weight: 520; }
+    .option:has(:checked) { border-color: #769884; background: var(--mint); }
+    .option input { accent-color: var(--brand); }
+    .decision .action { justify-self: end; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    @media (max-width: 800px) {
+      .shell { width: min(620px, calc(100% - 36px)); }
+      .workspace { grid-template-columns: 1fr; gap: 16px; }
+      main { padding-top: 25px; }
+      .intro { margin-bottom: 18px; }
+      .queue-jump { display: inline-flex; min-height: 44px; align-items: center; gap: 4px; color: var(--brand); font-size: 13px; font-weight: 650; }
+      .top-inner { min-height: 58px; gap: 12px; }
+      .crumb { padding-left: 12px; }
+    }
+    @media (max-width: 440px) {
+      .panel { border-radius: 16px; }
+      .panel-head { padding: 15px; }
+      .panel-head h2 { font-size: 19px; }
+      .panel-head .action { padding-inline: 6px; }
+      form, .detail { padding: 15px; }
+      .fields { gap: 12px; }
+      .amount { grid-template-columns: minmax(0, 1fr) 66px; gap: 4px; }
+      .amount select { padding-inline: 6px; }
+      .submit { flex-direction: column; align-items: stretch; }
+      .submit p { max-width: none; }
+      .side-head { padding-inline: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="shell top-inner">
+      <div class="brand"><span class="brand-mark" id="brand-mark"></span>RuleLoop</div>
+      <span class="crumb">待复盘</span>
+      <span class="preview">交互原型</span>
+    </div>
+  </header>
+  <main class="shell">
+    <header class="intro">
+      <h1>决策拦截台</h1>
+      <p>提交支出计划，查看 Hermes 的建议，再由你决定。</p>
+      <a href="#queue-title" class="queue-jump">查看审核记录 ↓</a>
+    </header>
+    <div class="workspace">
+      <section id="work" class="panel" aria-label="支出审核"></section>
+      <aside class="panel" aria-labelledby="queue-title">
+        <div class="side-head">
+          <h2 id="queue-title" tabindex="-1">审核记录</h2>
+          <div class="tabs" role="group" aria-label="筛选审核记录">
+            <button type="button" data-filter="open" aria-pressed="true">待处理 <span id="open-count">3</span></button>
+            <button type="button" data-filter="done" aria-pressed="false">已归档</button>
+          </div>
+        </div>
+        <div id="rows" class="rows"></div>
+        <section class="flow" aria-labelledby="flow-title">
+          <h3 id="flow-title">审核流程</h3>
+          <ol><li>检查冷静期</li><li>Hermes 审核</li><li>人工决定</li></ol>
+        </section>
+      </aside>
+    </div>
+    <p id="live" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+  <script>
+    const glyphs = {
+      loop: '<path d="M7 7h10l-3-3m3 3-3 3M17 17H7l3 3m-3-3 3-3M5 9a4 4 0 0 0 0 6m14-6a4 4 0 0 1 0 6"/>',
+      edit: '<path d="M11 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-6M9 15l1-4 8-8 3 3-8 8-4 1z"/>',
+      arrow: '<path d="M4 12h15m-6-6 6 6-6 6"/>',
+      chevron: '<path d="m9 6 6 6-6 6"/>',
+      clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+      alert: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5m0 4h.01"/>',
+      bot: '<rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 7V3M9 13h.01m6 0h.01M9 17h6M2 12v3m20-3v3"/>',
+      plus: '<path d="M12 5v14M5 12h14"/>',
+    };
+    const icon = (name) => '<svg class="icon ' + name + '" viewBox="0 0 24 24" aria-hidden="true">' + glyphs[name] + '</svg>';
+    const safe = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[character]);
+    const statuses = {
+      cooling: ['冷静期', 'clock'], ready: ['可重新检查', 'clock'],
+      queued: ['等待审核', 'clock'], running: ['审核中', 'bot'],
+      failed: ['审核失败', 'alert'], review: ['待人工确认', 'check'], done: ['已归档', 'check'],
+    };
+    const seeds = [
+      { id: 1, title: '降噪耳机', amount: 699, currency: 'CNY', category: '购物', status: 'review', purpose: '在共享空间学习时减少噪音。' },
+      { id: 2, title: '在线课程年费', amount: 399, currency: 'CNY', category: '课程学习', status: 'cooling', purpose: '希望系统学习网络基础。' },
+      { id: 3, title: '设计素材订阅', amount: 25, currency: 'USD', category: '新增订阅', status: 'failed', purpose: '给个人项目找一套可商用的素材。' },
+    ];
+    const storageKey = 'ruleloop-spending-review-hermes-preview-v1';
+    let records;
+    try { records = JSON.parse(sessionStorage.getItem(storageKey)) ?? seeds; }
+    catch { records = seeds; }
+    let selected = null;
+    let filter = 'open';
+    let draft = {};
+    const work = document.querySelector('#work');
+    const rows = document.querySelector('#rows');
+    const live = document.querySelector('#live');
+    document.querySelector('#brand-mark').innerHTML = icon('loop');
+
+    function persist() {
+      try { sessionStorage.setItem(storageKey, JSON.stringify(records)); }
+      catch { /* The preview still works in memory. */ }
+    }
+
+    function money(record) {
+      return new Intl.NumberFormat('zh-CN', {
+        style: 'currency', currency: record.currency, currencyDisplay: 'code', maximumFractionDigits: 0,
+      }).format(record.amount);
+    }
+
+    function heading(title, glyph, action, label, actionIcon = '') {
+      return '<div class="panel-head"><span class="tile">' + icon(glyph) + '</span><h2 tabindex="-1">' +
+        safe(title) + '</h2><button type="button" class="action quiet push" data-action="' + action + '">' +
+        (actionIcon ? icon(actionIcon) : '') + label + '</button></div>';
+    }
+
+    function renderForm() {
+      work.innerHTML = heading('提交支出审核', 'edit', 'sample', '填入示例') + `
+        <form id="intake">
+          <div class="fields">
+            <div class="field wide"><label for="title">支出名称</label>
+              <input id="title" name="title" placeholder="例如：降噪耳机" required maxlength="200"></div>
+            <div class="field"><label for="amount">金额</label>
+              <div class="amount">
+                <input id="amount" name="amount" type="number" placeholder="0" min="0" max="10000000" step="1" inputmode="numeric" required>
+                <select name="currency" aria-label="币种"><option>CNY</option><option>USD</option></select>
+              </div>
+            </div>
+            <div class="field"><label for="category">消费分类</label>
+              <select id="category" name="category" required>
+                <option value="">选择分类</option><option>购物</option><option>课程学习</option><option>AI 工具</option>
+                <option>软件</option><option>新增订阅</option><option>娱乐</option><option>高消费餐饮</option>
+                <option>旅行</option><option>情感消费</option><option>亲密相关</option><option>必要开支</option><option>其他</option>
+              </select>
+            </div>
+            <div class="field wide"><label for="purpose">它能解决什么问题？ <span class="optional">选填</span></label>
+              <textarea id="purpose" name="purpose" maxlength="2000" placeholder="例如：宿舍比较吵，想找一个能专心学习的办法。"></textarea>
+            </div>
+          </div>
+          <details class="extra">
+            <summary>${icon('chevron')} 补充决策背景 <span class="optional">状态、预算、替代方案</span></summary>
+            <div class="fields">
+              <div class="field"><label for="state">当前状态</label>
+                <select id="state" name="state"><option value="">请选择</option><option>状态正常</option><option>疲惫</option><option>睡眠不足</option><option>焦虑</option><option>强烈冲动</option></select></div>
+              <div class="field"><label for="funding">资金来源</label>
+                <select id="funding" name="funding"><option value="">请选择</option><option>预算内可支配资金</option><option>生活费</option><option>应急资金</option><option>借款或信用额度</option></select></div>
+              <div class="field wide"><label for="alternative">更低成本的方案</label>
+                <input id="alternative" name="alternative" maxlength="1000" placeholder="例如：先用现有耳机试一周"></div>
+            </div>
+          </details>
+          <p id="form-error" class="error" role="alert"></p>
+          <div class="submit">
+            <p>先检查冷静期，符合条件后由 VPS 上的 Hermes 用免费模型审核。</p>
+            <button type="submit" class="action primary">提交审核 ${icon('arrow')}</button>
+          </div>
+        </form>`;
+      const form = document.querySelector('#intake');
+      for (const [key, value] of Object.entries(draft)) {
+        form.elements.namedItem(key).value = value;
+      }
+      form.addEventListener('input', () => { draft = Object.fromEntries(new FormData(form)); });
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const input = Object.fromEntries(new FormData(form));
+        if (!input.title.trim()) {
+          document.querySelector('#form-error').textContent = '请填写支出名称。';
+          form.elements.title.focus();
+          return;
+        }
+        const amount = Number(input.amount);
+        const demoCooling = amount * (input.currency === 'USD' ? 7.3 : 1) >= 300 ||
+          input.category === '新增订阅' || (input.state && input.state !== '状态正常');
+        const id = Math.max(Date.now(), (records[0]?.id ?? 0) + 1);
+        const record = { ...input, title: input.title.trim(), amount, id, status: demoCooling ? 'cooling' : 'queued' };
+        records = [record, ...records];
+        draft = {};
+        persist();
+        show(record.id);
+        if (!demoCooling) simulate(record);
+      });
+    }
+
+    function report(record) {
+      const canUseExisting = record.id === 1;
+      return `
+        <section class="notice" aria-labelledby="report-title">
+          <h3 id="report-title">${icon('bot')} Hermes 审核建议 <span class="optional">示例结果</span></h3>
+          <dl class="report">
+            <div><dt>建议</dt><dd>先试低成本方案</dd></div>
+            <div><dt>主要风险</dt><dd>${canUseExisting ? '还没验证共享空间的噪音是否只能靠主动降噪解决。' : '当前记录不足以确认这笔支出值得现在发生。'}</dd></div>
+            <div><dt>可尝试的替代方案</dt><dd>${canUseExisting ? '先用现有耳机在同一地点学习两次，再比较专注时间。' : '用已拥有的资源试一次，再记录仍然存在的问题。'}</dd></div>
+          </dl>
+        </section>`;
+    }
+
+    function decisionForm() {
+      return `<form id="decision" class="decision">
+          <fieldset><legend>你的决定</legend><div class="options">
+            ${['取消', '延迟', '缩减或替代', '确认支出'].map((label) => '<label class="option"><input type="radio" name="decision" value="' + label + '" required> ' + label + '</label>').join('')}
+          </div></fieldset>
+          <div class="field"><label for="reason">决定理由 <span class="optional">选填</span></label>
+            <textarea id="reason" name="reason" maxlength="2000" rows="2"></textarea></div>
+          <button type="submit" class="action primary">保存决定</button>
+        </form>`;
+    }
+
+    function detailBody(record) {
+      switch (record.status) {
+        case 'cooling':
+          return '<section class="notice cooling"><h3>先完成冷静期</h3><p>记录已保存。冷静期结束后，确认仍有需要即可启动 Hermes 审核。</p><button type="button" class="action outline" data-action="ready">演示冷静期结束</button></section>';
+        case 'ready':
+          return '<section class="notice cooling"><h3>冷静期已结束</h3><p>这笔支出现在仍有必要吗？</p><div><button type="button" class="action primary" data-action="start">仍有需要，开始审核</button> <button type="button" class="action quiet" data-action="cancel">取消支出</button></div></section>';
+        case 'queued':
+          return '<section class="notice"><h3>已加入审核队列</h3><p>你可以离开此页，稍后从审核记录查看结果。</p></section>';
+        case 'running':
+          return '<section class="notice"><h3>Hermes 正在审核</h3><p>本地模型启动可能需要几分钟。你可以离开此页，稍后回到此记录查看结果。</p></section>';
+        case 'failed':
+          return '<section class="notice failed"><h3>本次审核未完成</h3><p>模型响应超时。已保留你填写的信息，可以在这条记录上重试。</p><button type="button" class="action outline" data-action="start">重试 Hermes 审核</button></section>';
+        case 'review':
+          return report(record) + decisionForm();
+        case 'done':
+          return '<section class="notice"><h3>已保存决定 · ' + safe(record.decision) + '</h3>' +
+            (record.reason ? '<p>' + safe(record.reason) + '</p>' : '') + '</section>' +
+            (record.hasReport ? report(record) : '');
+      }
+    }
+
+    function renderDetail(record) {
+      const [label, glyph] = statuses[record.status];
+      const context = [['当前状态', record.state], ['资金来源', record.funding], ['替代方案', record.alternative]]
+        .filter(([, value]) => value);
+      work.innerHTML = heading(record.title, glyph, 'new', '新建审核', 'plus') + `
+        <div class="detail">
+          <div class="overview"><div><p class="amount-label">${money(record)}</p>
+            <p>${safe(record.category)}</p></div><span class="badge ${record.status}">${label}</span></div>
+          ${record.purpose ? '<p>' + safe(record.purpose) + '</p>' : ''}
+          ${detailBody(record)}
+          ${context.length ? '<details class="extra"><summary>提交时填写的决策背景</summary><dl class="report fields">' +
+            context.map(([key, value]) => '<div><dt>' + key + '</dt><dd>' + safe(value) + '</dd></div>').join('') +
+            '</dl></details>' : ''}
+        </div>`;
+      const decision = document.querySelector('#decision');
+      decision?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const values = new FormData(decision);
+        archive(record, values.get('decision'), values.get('reason'));
+      });
+    }
+
+    function renderRows() {
+      const state = records.find((record) => record.id === selected)?.status;
+      const step = ['cooling', 'ready'].includes(state) ? 0
+        : ['queued', 'running', 'failed'].includes(state) ? 1
+        : state === 'review' ? 2 : -1;
+      document.querySelectorAll('.flow li').forEach((item, index) => {
+        if (index === step) item.setAttribute('aria-current', 'step');
+        else item.removeAttribute('aria-current');
+      });
+      document.querySelector('#open-count').textContent = records.filter((record) => record.status !== 'done').length;
+      document.querySelectorAll('[data-filter]').forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
+      });
+      const list = records.filter((record) => (record.status === 'done') === (filter === 'done'));
+      rows.innerHTML = list.map((record) => {
+        const [label, glyph] = statuses[record.status];
+        return `<button type="button" class="record" data-id="${record.id}" aria-current="${record.id === selected}">
+          <span class="tile ${record.status}">${icon(glyph)}</span>
+          <span><span class="record-title">${safe(record.title)}</span><span class="record-sub">${money(record)}</span></span>
+          <span><span class="badge ${record.status}">${label}</span> ${icon('chevron')}</span>
+        </button>`;
+      }).join('') || '<p class="empty">' + (filter === 'done' ? '还没有归档的决定。' : '当前没有待处理的审核。') + '</p>';
+    }
+
+    function show(id) {
+      selected = id;
+      const record = records.find((entry) => entry.id === id);
+      if (record) {
+        filter = record.status === 'done' ? 'done' : 'open';
+        renderDetail(record);
+      } else {
+        renderForm();
+      }
+      renderRows();
+      work.querySelector('h2').focus({ preventScroll: true });
+      work.scrollIntoView({ block: 'nearest' });
+    }
+
+    function transition(record, status) {
+      record.status = status;
+      persist();
+      if (selected === record.id) {
+        const restoreFocus = work.contains(document.activeElement);
+        renderDetail(record);
+        if (restoreFocus) work.querySelector('h2').focus({ preventScroll: true });
+      }
+      renderRows();
+      live.textContent = record.title + '，' + statuses[status][0];
+    }
+
+    function simulate(record) {
+      setTimeout(() => {
+        if (record.status !== 'queued') return;
+        transition(record, 'running');
+        setTimeout(() => {
+          if (record.status === 'running') transition(record, 'review');
+        }, 2200);
+      }, 1100);
+    }
+
+    function archive(record, decision, reason) {
+      record.hasReport = record.status === 'review';
+      record.decision = decision;
+      record.reason = reason;
+      transition(record, 'done');
+      show(record.id);
+    }
+
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      if (button.dataset.filter) {
+        filter = button.dataset.filter;
+        renderRows();
+      }
+      if (button.dataset.id) show(Number(button.dataset.id));
+      const record = records.find((entry) => entry.id === selected);
+      switch (button.dataset.action) {
+        case 'sample': {
+          draft = { title: '桌面阅读灯', amount: '149', currency: 'CNY', category: '购物', purpose: '书桌角落光线太暗，想让晚上读书更舒服。' };
+          renderForm();
+          document.querySelector('#title').focus();
+          break;
+        }
+        case 'new': show(null); break;
+        case 'ready':
+          transition(record, 'ready');
+          work.querySelector('[data-action="start"]').focus();
+          break;
+        case 'start':
+          transition(record, 'queued');
+          work.querySelector('h2').focus();
+          simulate(record);
+          break;
+        case 'cancel': archive(record, '取消', '冷静期结束后决定取消。'); break;
+      }
+    });
+    renderForm();
+    renderRows();
+    for (const record of records) {
+      if (record.status === 'running' || record.status === 'queued') {
+        record.status = 'queued';
+        simulate(record);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790750870452,
+      "tag": "0000_initial_online_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790750870758,
+      "tag": "0001_account_integrity",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793422472685,
+      "tag": "0002_agent_rule_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794073199692,
+      "tag": "0003_conversion_outcome_currency",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794371719476,
+      "tag": "0004_habit_checkins",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794377771611,
+      "tag": "0005_spending_review_hermes",
+      "breakpoints": true
+    }
+  ]
+}

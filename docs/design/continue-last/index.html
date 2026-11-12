@@ -1,0 +1,2151 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>继续上次 · RuleLoop 决策回路</title>
+    <style>
+      /* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio, geometry.
+   Put this @layer first; product CSS outside the layer wins ordinary layout rules.
+   Native hidden and closed-dialog states take precedence over component display rules. */
+      @layer od-layout {
+        [hidden]:not([hidden='until-found' i]) {
+          display: none !important;
+        }
+        dialog:not([open]) {
+          display: none !important;
+        }
+
+        :where(
+            .od-stack,
+            .od-row,
+            .od-row-top,
+            .od-cluster,
+            .od-grid,
+            .od-field,
+            .od-stat,
+            .od-cell,
+            .od-tile
+          )
+          > :where(*) {
+          min-width: 0;
+        }
+
+        /* containers */
+        .od-stack {
+          display: flex;
+          flex-direction: column;
+          gap: var(--od-gap, 8px);
+        }
+        .od-row {
+          display: flex;
+          align-items: center;
+          gap: var(--od-gap, 8px);
+        }
+        .od-row-top {
+          display: flex;
+          align-items: flex-start;
+          gap: var(--od-gap, 8px);
+        }
+        .od-cluster {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: var(--od-gap, 8px);
+        }
+        .od-fill {
+          flex: 1 1 0;
+          min-width: 0;
+        }
+        .od-fixed {
+          flex: none;
+        }
+        .od-grid {
+          display: grid;
+          gap: var(--od-gap, 12px);
+          grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr));
+        }
+
+        /* stacked information: each piece is its own line — never sibling inline spans */
+        .od-stat,
+        .od-field,
+        .od-cell {
+          display: grid;
+          gap: var(--od-gap, 2px);
+        }
+        :where(.od-stat, .od-field, .od-cell) > :where(*) {
+          display: block;
+        }
+        .od-tile {
+          display: grid;
+          grid-template-rows: auto 1fr;
+        }
+        :where(.od-tile) > :where(*) {
+          display: block;
+        }
+
+        /* media keeps its intrinsic ratio by default; never a distorted or cropped
+     cover by accident. height:auto lets the ratio win over an <img height="…">
+     attribute. Cropping to a uniform box is an explicit opt-in: set --od-ratio
+     AND add .od-media-cover together (per the core rule, only where a crop is
+     deliberate — tile thumbs, decorative fills — never on full-frame content). */
+        .od-media {
+          display: block;
+          width: 100%;
+          height: auto;
+          aspect-ratio: var(--od-ratio, auto);
+        }
+        .od-media-cover {
+          object-fit: cover;
+        }
+
+        /* functional inline SVG icons opt into bounded geometry; content SVGs keep their own */
+        .od-icon {
+          display: inline-block;
+          inline-size: var(--od-icon-size, 1em);
+          block-size: var(--od-icon-size, 1em);
+          flex: none;
+        }
+
+        /* data text only — authored copy is rewritten to its budget instead */
+        .od-truncate {
+          display: block;
+          max-width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .od-clamp-2,
+        .od-clamp-3 {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          overflow-wrap: anywhere;
+        }
+        .od-clamp-2 {
+          -webkit-line-clamp: 2;
+        }
+        .od-clamp-3 {
+          -webkit-line-clamp: 3;
+        }
+        .od-lines-2 {
+          min-height: calc(2 * 1.4em);
+        } /* block-level reservation for a shared baseline */
+        .od-nowrap {
+          white-space: nowrap;
+        } /* 数字+单位 · 价格+起 · 日期+星期 */
+        .od-keep {
+          word-break: keep-all;
+          overflow-wrap: anywhere;
+        } /* CJK labels break at spaces / <wbr> first */
+
+        /* screen skeleton (optional): bars take their own space, the middle scrolls — no padding guessed for chrome */
+        .od-screen {
+          display: grid;
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          height: 100%;
+        }
+        .od-scroll {
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          min-height: 0;
+        }
+
+        /* horizontal rail: the next item peeks at the edge; trailing room survives overflow */
+        .od-rail {
+          display: flex;
+          gap: var(--od-gap, 8px);
+          overflow-x: auto;
+          scroll-snap-type: x proximity;
+          scrollbar-width: none;
+          padding-inline: var(--od-rail-pad, 16px);
+          scroll-padding-inline: var(--od-rail-pad, 16px);
+        }
+        .od-rail::-webkit-scrollbar {
+          display: none;
+        }
+        :where(.od-rail) > :where(*) {
+          flex: none;
+          scroll-snap-align: start;
+        }
+        :where(.od-rail) > :where(:last-child) {
+          margin-inline-end: var(--od-rail-pad, 16px);
+        }
+
+        .od-spacer {
+          flex: none;
+          visibility: hidden;
+          pointer-events: none;
+        }
+        .od-touch {
+          min-width: 44px;
+          min-height: 44px;
+        }
+      }
+      :root [hidden]:where(:not([hidden='until-found' i])) {
+        display: none;
+      }
+      /* /OD-LAYOUT-PRIMITIVES v1 */
+      :root {
+        --bg: #0b0e16;
+        --panel: #141823;
+        --line: #2a3040;
+        --text: #eceef4;
+        --muted: #a0a7b7;
+        --gold: #eec363;
+        --gold-line: #77643c;
+        --green: #9bd4b0;
+        --error: #ffb4b0;
+        --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        --serif: 'Iowan Old Style', 'Palatino Linotype', 'Songti SC', SimSun, serif;
+        --mono: 'SFMono-Regular', Consolas, monospace;
+        --s1: 8px;
+        --s2: 16px;
+        --s3: 24px;
+        --s4: 32px;
+        --s5: 48px;
+        --radius: 8px;
+        --speed: 180ms;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 16px/1.75 var(--sans);
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+      button,
+      a,
+      input,
+      textarea,
+      select {
+        -webkit-tap-highlight-color: transparent;
+      }
+      button {
+        cursor: pointer;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      button {
+        min-height: 44px;
+        color: var(--text);
+        background: transparent;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 8px 16px;
+        letter-spacing: 0.02em;
+        transition:
+          background var(--speed),
+          border-color var(--speed);
+      }
+      button:hover {
+        background: var(--panel);
+        border-color: var(--muted);
+      }
+      button:disabled {
+        cursor: default;
+        opacity: 0.55;
+      }
+      a {
+        color: var(--gold);
+        text-underline-offset: 4px;
+        overflow-wrap: anywhere;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible,
+      select:focus-visible,
+      summary:focus-visible,
+      [tabindex]:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 4px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font: 400 40px/1.4 var(--serif);
+        letter-spacing: 0;
+      }
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+      h3 {
+        font-size: 16px;
+        font-weight: 600;
+      }
+      p {
+        overflow-wrap: anywhere;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .small {
+        font-size: 14px;
+      }
+      .micro {
+        font: 12px/1.5 var(--mono);
+        letter-spacing: 0.08em;
+      }
+      .kicker {
+        color: var(--muted);
+        font: 12px/1.5 var(--mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .gold {
+        color: var(--gold);
+      }
+      .tag {
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        padding: 4px 8px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .tag.success {
+        color: var(--green);
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        background: currentColor;
+        display: inline-block;
+        border-radius: 50%;
+        flex: none;
+      }
+      .rule {
+        height: 1px;
+        background: var(--line);
+      }
+      .primary {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: var(--bg);
+        font-weight: 600;
+      }
+      .primary:hover {
+        background: #f6d58f;
+        border-color: #f6d58f;
+      }
+      .secondary {
+        border-color: var(--gold-line);
+        color: var(--gold);
+      }
+      .text-btn {
+        border-color: transparent;
+        padding-inline: 8px;
+        color: var(--muted);
+      }
+      .text-btn:hover {
+        color: var(--text);
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .icon {
+        --od-icon-size: 20px;
+        vertical-align: middle;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .with-icon {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+      }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 192px;
+        border-right: 1px solid var(--line);
+        padding: 32px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        background: var(--bg);
+      }
+      .wordmark {
+        font: 400 28px/1.3 var(--serif);
+        letter-spacing: -0.02em;
+      }
+      .sidebar .kicker {
+        margin-top: 8px;
+      }
+      .nav-list {
+        display: grid;
+        gap: 8px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: var(--muted);
+        font-size: 14px;
+        min-height: 40px;
+        padding: 4px 8px;
+      }
+      .nav-item:first-child {
+        color: var(--text);
+      }
+      .side-foot {
+        margin-top: auto;
+        border-top: 1px solid var(--line);
+        padding-top: 24px;
+      }
+      .shell {
+        margin-left: 192px;
+      }
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 48px;
+        border-bottom: 1px solid var(--line);
+        gap: 16px;
+      }
+      .top-brand {
+        font-size: 14px;
+        letter-spacing: 0.02em;
+      }
+      .top-status {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .main {
+        max-width: 1232px;
+        margin: auto;
+        padding: 40px 48px 32px;
+      }
+      .page-head {
+        margin-bottom: 32px;
+      }
+      .page-head > p {
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .eyebrow-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        gap: 16px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 24px;
+      }
+      .half {
+        grid-column: span 6;
+        min-width: 0;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+      }
+      .home-section {
+        margin-top: 32px;
+      }
+      .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .value-card {
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+      }
+      .value-card .od-icon {
+        color: var(--gold);
+      }
+      .value-card h3 {
+        font-size: 20px;
+        font-family: var(--serif);
+        font-weight: 400;
+      }
+      .value-card p {
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .section-no {
+        font: 12px var(--mono);
+        color: var(--muted);
+      }
+      .entry-list {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 16px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+      .read-only-link {
+        padding: 8px 16px 8px 0;
+        margin-right: 8px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .resume-entry {
+        margin-left: auto;
+        min-width: 160px;
+      }
+      .pending {
+        padding: 24px;
+        display: flex;
+        gap: 24px;
+        align-items: center;
+      }
+      .pending .copy {
+        flex: 1;
+      }
+      .pending p {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 8px;
+      }
+      .home-foot {
+        margin: 32px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .back {
+        padding-left: 0;
+        border: 0;
+        color: var(--muted);
+        margin-bottom: 16px;
+      }
+      .workspace-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-end;
+      }
+      .workspace-head p {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+      .track {
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        position: relative;
+      }
+      .track:before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        left: 24px;
+        width: 32px;
+        height: 1px;
+        background: var(--gold);
+      }
+      .track-head {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      .track-name {
+        margin-top: 4px;
+      }
+      .project-identity {
+        min-height: 100px;
+        display: grid;
+        align-content: start;
+        gap: 8px;
+      }
+      .project-identity p {
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .track-status {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .focus-block {
+        padding: 24px 0;
+        min-height: 184px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+      .focus-label {
+        font-size: 14px;
+        color: var(--gold);
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .focus-title {
+        font: 400 25px/1.55 var(--serif);
+        overflow-wrap: anywhere;
+      }
+      .focus-note {
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 12px;
+      }
+      .context {
+        margin-top: 24px;
+        display: grid;
+        gap: 8px;
+      }
+      .context-label {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+      .context p {
+        font-size: 14px;
+      }
+      .context time {
+        font: 12px/1.5 var(--mono);
+        color: var(--muted);
+      }
+      .track-bottom {
+        margin-top: auto;
+        padding-top: 24px;
+      }
+      .track-bottom > .actions {
+        margin-bottom: 16px;
+      }
+      .sub-actions {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+      .paper-switch {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .paper-switch button {
+        padding: 4px 12px;
+        min-height: 44px;
+        font-size: 14px;
+      }
+      .paper-switch button[aria-pressed='true'] {
+        border-color: var(--muted);
+        background: var(--bg);
+        color: var(--text);
+      }
+      .paper-title {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 16px;
+        overflow-wrap: anywhere;
+      }
+      .reading-track .focus-block {
+        min-height: 184px;
+      }
+      .track .current-tools {
+        padding-top: 8px;
+      }
+      .hypothesis {
+        margin-top: 24px;
+        border-top: 1px solid var(--line);
+        padding-top: 20px;
+      }
+      .hypothesis h3 {
+        margin: 8px 0;
+      }
+      .hypothesis dl {
+        margin: 12px 0 0;
+        font-size: 14px;
+      }
+      .hypothesis dt {
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .hypothesis dd {
+        margin: 4px 0 0;
+        overflow-wrap: anywhere;
+      }
+      .history {
+        margin-top: 40px;
+      }
+      .history-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .history-tabs button {
+        font-size: 14px;
+      }
+      .history-tabs button[aria-pressed='true'] {
+        background: var(--panel);
+        border-color: var(--muted);
+      }
+      .record {
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr);
+        gap: 24px;
+        padding: 20px 0;
+        border-top: 1px solid var(--line);
+      }
+      .record time {
+        color: var(--muted);
+        font: 12px/1.75 var(--mono);
+      }
+      .record .record-kind {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .record p {
+        font-size: 14px;
+      }
+      .record .record-next {
+        margin-top: 8px;
+        color: var(--muted);
+      }
+      .empty {
+        padding: 24px 0;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .review {
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
+      }
+      .review summary {
+        cursor: pointer;
+        min-height: 44px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .review-body {
+        padding: 16px 0;
+        display: grid;
+        gap: 16px;
+      }
+      .review-tools {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .review-tools button {
+        font-size: 14px;
+      }
+      .notice {
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        display: grid;
+        gap: 12px;
+      }
+      .notice .notice-title {
+        font-size: 18px;
+      }
+      .notice .actions {
+        justify-content: space-between;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 32px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .bottom-nav {
+        display: none;
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--panel);
+        color: var(--green);
+        border: 1px solid var(--line);
+        padding: 12px 24px;
+        border-radius: var(--radius);
+        z-index: 30;
+        width: max-content;
+        max-width: calc(100% - 32px);
+        font-size: 14px;
+        pointer-events: none;
+      }
+      .toast:empty {
+        display: none;
+      }
+      dialog {
+        color: var(--text);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0;
+        width: min(560px, calc(100% - 32px));
+        max-height: calc(100dvh - 48px);
+      }
+      dialog::backdrop {
+        background: rgb(0 0 0 / 0.72);
+      }
+      .dialog-inner {
+        padding: 32px;
+      }
+      .dialog-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 8px;
+      }
+      .dialog-head h2 {
+        font: 400 28px/1.4 var(--serif);
+      }
+      .close {
+        padding: 8px;
+        min-width: 44px;
+      }
+      .dialog-description {
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 24px;
+      }
+      .field {
+        display: grid;
+        gap: 8px;
+        margin-top: 20px;
+      }
+      .field label {
+        font-size: 14px;
+      }
+      .field .optional {
+        color: var(--muted);
+        font-size: 12px;
+        margin-left: 8px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        max-width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 12px;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 16px;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 112px;
+        line-height: 1.75;
+      }
+      input::placeholder,
+      textarea::placeholder {
+        color: var(--muted);
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .error {
+        color: var(--error);
+        font-size: 14px;
+      }
+      .dialog-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 24px;
+        position: sticky;
+        bottom: 0;
+        background: var(--panel);
+        padding-top: 16px;
+        padding-bottom: 8px;
+      }
+      .check-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-top: 24px;
+        font-size: 14px;
+      }
+      .check-row input {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--gold);
+        margin-top: 4px;
+        flex: none;
+      }
+      .only-home[hidden],
+      .only-work[hidden] {
+        display: none !important;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        clip: rect(0, 0, 0, 0);
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      @media (min-width: 1280px) {
+        .home-page {
+          max-width: 960px;
+        }
+        .track {
+          min-height: 560px;
+        }
+      }
+      @media (max-width: 1023px) {
+        .sidebar {
+          width: 152px;
+          padding: 24px 16px;
+        }
+        .shell {
+          margin-left: 152px;
+        }
+        .main {
+          padding: 32px 24px;
+        }
+        .topbar {
+          padding: 20px 24px;
+        }
+        .track {
+          padding: 24px;
+        }
+        .grid {
+          gap: 16px;
+        }
+        .focus-title {
+          font-size: 23px;
+        }
+      }
+      @media (max-width: 767px) {
+        .sidebar {
+          display: none;
+        }
+        .shell {
+          margin: 0;
+        }
+        .topbar {
+          padding: 16px 20px;
+          align-items: flex-start;
+        }
+        .top-brand {
+          font-size: 14px;
+        }
+        .top-status {
+          font-size: 12px;
+        }
+        .main {
+          padding: 24px 20px 112px;
+        }
+        .half {
+          grid-column: span 12;
+        }
+        .home-values .half {
+          grid-column: span 6;
+        }
+        .grid {
+          gap: 16px;
+        }
+        h1 {
+          font-size: 32px;
+        }
+        .page-head {
+          margin-bottom: 24px;
+        }
+        .page-head > p {
+          font-size: 14px;
+        }
+        .home-section {
+          margin-top: 24px;
+        }
+        .value-card {
+          padding: 16px;
+          gap: 12px;
+        }
+        .value-card h3 {
+          font-size: 18px;
+          line-height: 1.5;
+        }
+        .value-card p {
+          font-size: 12px;
+          line-height: 1.7;
+        }
+        .section-heading h2 {
+          font-size: 18px;
+        }
+        .entry-list {
+          gap: 8px;
+          padding: 8px 0 16px;
+        }
+        .read-only-link {
+          padding: 4px 0;
+          margin-right: 12px;
+          font-size: 14px;
+        }
+        .resume-entry {
+          margin: 0;
+          width: 100%;
+          justify-content: space-between;
+        }
+        .pending {
+          padding: 20px;
+          gap: 16px;
+        }
+        .home-foot {
+          margin-top: 24px;
+        }
+        .workspace-head {
+          align-items: flex-start;
+        }
+        .workspace-head .tag {
+          display: none;
+        }
+        .workspace-head p {
+          font-size: 14px;
+        }
+        .track {
+          padding: 24px;
+        }
+        .focus-block {
+          min-height: 0;
+          padding: 24px 0;
+        }
+        .reading-track .focus-block {
+          min-height: 0;
+        }
+        .focus-title {
+          font-size: 24px;
+        }
+        .track-head {
+          margin-bottom: 24px;
+        }
+        .track-status {
+          font-size: 12px;
+        }
+        .track-name {
+          font-size: 18px;
+        }
+        .track-bottom {
+          padding-top: 24px;
+        }
+        .track-bottom > .actions > button:first-child {
+          flex: 1;
+        }
+        .sub-actions {
+          font-size: 14px;
+        }
+        .sub-actions button {
+          font-size: 14px;
+        }
+        .record {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        .history {
+          margin-top: 32px;
+        }
+        .review {
+          margin-top: 32px;
+        }
+        .footer {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .bottom-nav {
+          position: fixed;
+          inset: auto 0 0;
+          background: var(--bg);
+          border-top: 1px solid var(--line);
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+          z-index: 10;
+        }
+        .bottom-nav .nav-cell {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          min-height: 48px;
+          font-size: 12px;
+          color: var(--muted);
+        }
+        .bottom-nav button {
+          padding: 0;
+          border: 0;
+          border-radius: 4px;
+          color: var(--gold) !important;
+        }
+        .bottom-nav .od-icon {
+          --od-icon-size: 20px;
+        }
+        .toast {
+          bottom: 88px;
+        }
+        dialog {
+          width: 100%;
+          max-width: 100%;
+          max-height: calc(100dvh - 24px);
+          margin: auto 0 0;
+          border-radius: 16px 16px 0 0;
+        }
+        .dialog-inner {
+          padding: 24px 20px calc(16px + env(safe-area-inset-bottom));
+        }
+        .dialog-head h2 {
+          font-size: 26px;
+        }
+        .dialog-actions {
+          padding-bottom: 8px;
+        }
+        .dialog-actions button {
+          flex: 1;
+        }
+        .notice {
+          padding: 16px;
+        }
+        .review-tools {
+          gap: 8px;
+        }
+        .review-tools .actions {
+          width: 100%;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *:before,
+        *:after {
+          transition: none !important;
+          animation: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
+      /* Fit the new entry into the account app's homepage and side rail. */
+      .home-page {
+        max-width: none;
+      }
+      .home-intro {
+        margin-bottom: 16px;
+      }
+      .home-intro h1 {
+        margin-top: 8px;
+      }
+      .home-values .money-preview {
+        grid-column: span 7;
+      }
+      .home-values .life-preview {
+        grid-column: span 5;
+      }
+      .home-values .value-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 18px 20px;
+      }
+      .value-card h2 {
+        font-size: 18px;
+      }
+      .value-card h2 .icon {
+        color: var(--gold);
+      }
+      .money-label {
+        margin-top: 5px;
+      }
+      .mock-fields {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 7px;
+        width: 100%;
+      }
+      .mock-field {
+        min-height: 39px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        color: var(--muted);
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        font-size: 13px;
+      }
+      .mock-amount {
+        flex: 1;
+        min-width: 52px;
+      }
+      .mock-cta {
+        color: #20170a;
+        background: var(--gold);
+        font-weight: 650;
+        border-color: var(--gold);
+      }
+      .life-preview .mock-field {
+        margin-top: auto;
+      }
+      .home-continuation {
+        margin-top: 14px;
+      }
+      .home-continuation .entry-list {
+        gap: 8px 14px;
+        border-bottom: 0;
+        padding-block: 0;
+      }
+      .home-continuation .read-only-link {
+        margin: 0;
+        padding: 0;
+      }
+      .home-continuation h2 {
+        font-size: 14px;
+        font-weight: 550;
+      }
+      .home-continuation .resume-entry {
+        width: auto;
+        margin-left: 4px;
+      }
+      .home-pending {
+        max-width: 730px;
+        margin-top: 18px;
+        padding: 17px 20px;
+        border-color: #51462f;
+      }
+      .home-pending h2 {
+        margin: 3px 0 5px;
+      }
+      .home-pending .copy p:first-child {
+        color: var(--gold);
+      }
+      .home-foot {
+        margin-top: 16px;
+      }
+      .focus-title,
+      .paper-title,
+      .context p,
+      .record p,
+      .hypothesis dd {
+        overflow-wrap: anywhere;
+      }
+      @media (min-width: 768px) {
+        .sidebar {
+          width: 108px;
+          padding: 0 8px 8px;
+          overflow: auto;
+        }
+        .sidebar > div:first-child {
+          display: grid;
+          align-content: center;
+          justify-items: center;
+          min-height: 92px;
+          border-bottom: 1px solid var(--line);
+        }
+        .sidebar .wordmark {
+          font-size: 18px;
+        }
+        .sidebar .kicker {
+          font-size: 9px;
+          letter-spacing: 0.1em;
+        }
+        .sidebar .nav-list {
+          margin-top: 8px;
+        }
+        .sidebar .nav-item {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 4px;
+          min-height: 52px;
+          font-size: 13px;
+        }
+        .sidebar .side-foot {
+          display: none;
+        }
+        .shell {
+          margin-left: 108px;
+        }
+      }
+      @media (max-width: 767px) {
+        .home-values .money-preview,
+        .home-values .life-preview {
+          grid-column: span 12;
+        }
+        .home-values .value-card {
+          padding: 12px 14px;
+          gap: 6px;
+        }
+        .home-values .value-card p {
+          font-size: 13px;
+        }
+        .home-continuation h2 {
+          flex-basis: 100%;
+        }
+        .home-continuation .entry-list {
+          gap: 6px 9px;
+        }
+        .home-continuation .resume-entry {
+          margin-left: 0;
+        }
+        .home-pending {
+          margin-top: 16px;
+        }
+      }
+
+      /* Keep the return point and recording action near the first viewport. */
+      .workspace-head {
+        margin-bottom: 20px;
+      }
+      .workspace-head .kicker {
+        margin-bottom: 4px !important;
+      }
+      .track {
+        min-height: 0;
+        padding: 22px 24px;
+      }
+      .track-head {
+        margin-bottom: 14px;
+      }
+      .project-identity {
+        min-height: 76px;
+      }
+      .paper-switch {
+        margin-bottom: 6px;
+      }
+      .paper-title {
+        margin-bottom: 9px;
+      }
+      .focus-block,
+      .reading-track .focus-block {
+        padding: 14px 0;
+        min-height: 108px;
+      }
+      .focus-label {
+        margin-bottom: 7px;
+      }
+      .focus-title {
+        text-wrap: pretty;
+      }
+      .focus-note {
+        margin-top: 6px;
+      }
+      .context {
+        margin-top: 12px;
+        gap: 3px;
+      }
+      .track-bottom {
+        padding-top: 14px;
+      }
+      .track-bottom > .actions {
+        margin-bottom: 9px;
+      }
+      .sub-actions {
+        justify-content: flex-start;
+        gap: 3px 12px;
+        padding-top: 4px;
+      }
+      @media (min-width: 1024px) {
+        .topbar {
+          padding-inline: max(48px, calc((100vw - 108px - 1232px) / 2 + 48px));
+        }
+      }
+      @media (max-width: 767px) {
+        .workspace-head {
+          margin-bottom: 16px;
+        }
+        .track {
+          padding: 17px 16px;
+        }
+        .track-head {
+          margin-bottom: 10px;
+        }
+        .project-identity {
+          min-height: 0;
+          margin-bottom: 10px;
+          gap: 4px;
+        }
+        .focus-block,
+        .reading-track .focus-block {
+          min-height: 0;
+          padding: 12px 0;
+        }
+        .focus-title {
+          font-size: 21px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" aria-hidden="true" style="position: absolute">
+      <defs>
+        <symbol id="i-loop" viewBox="0 0 24 24"><path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5" /></symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6" /></symbol>
+        <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H4m6-6-6 6 6 6" /></symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24">
+          <rect x="4" y="4" width="6" height="6" />
+          <rect x="14" y="4" width="6" height="6" />
+          <rect x="4" y="14" width="6" height="6" />
+          <rect x="14" y="14" width="6" height="6" />
+        </symbol>
+        <symbol id="i-book" viewBox="0 0 24 24">
+          <path d="M12 5v15M3 4h5c2 0 4 1 4 3 0-2 2-3 4-3h5v15h-5c-2 0-4 1-4 2 0-1-2-2-4-2H3Z" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 7v5l3 2" />
+        </symbol>
+        <symbol id="i-file" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5ZM14 3v5h5M9 12h6m-6 4h6" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <rect x="5" y="10" width="14" height="11" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2" />
+        </symbol>
+        <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18" /></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v12h14V9m-10 12v-8h6v8" /></symbol>
+      </defs>
+    </svg>
+    <aside class="sidebar" aria-label="既有导航，只读展示">
+      <div>
+        <div class="wordmark">RuleLoop</div>
+        <div class="kicker">Field Notes</div>
+      </div>
+      <div class="nav-list" id="side-nav"></div>
+      <div class="side-foot">
+        <span class="tag"><span class="dot"></span> 账户私有</span>
+        <p class="small muted" style="margin-top: 12px">把判断留在回路里。</p>
+      </div>
+    </aside>
+    <div class="shell">
+      <header class="topbar">
+        <div class="top-brand">RuleLoop <span class="muted">· 决策回路</span></div>
+        <div class="top-status">
+          <svg class="od-icon icon" aria-hidden="true"><use href="#i-lock" /></svg>交互原型 · 示例数据
+        </div>
+      </header>
+      <main class="main">
+        <section id="home" class="home-page" aria-labelledby="home-title">
+          <div class="page-head home-intro">
+            <h1 id="home-title" tabindex="-1">钱与时间</h1>
+            <p>付款前比较这笔钱还能用在哪里，也看一眼留给计划的时间。</p>
+          </div>
+          <div class="grid home-values">
+            <section class="panel value-card money-preview" aria-labelledby="money-title">
+              <h2 class="with-icon" id="money-title">
+                <svg class="od-icon icon" aria-hidden="true"><use href="#i-grid" /></svg>金额换算
+              </h2>
+              <p class="small muted money-label">计划金额</p>
+              <div class="mock-fields" aria-hidden="true">
+                <span class="mock-field mock-amount">输入金额</span>
+                <span class="mock-field">CNY 人民币</span>
+                <span class="mock-field mock-cta"
+                  >继续换算 <svg class="od-icon icon"><use href="#i-arrow" /></svg
+                ></span>
+              </div>
+              <p class="small muted">常用对照 · 按价值目录查看</p>
+            </section>
+            <section class="panel value-card life-preview" aria-labelledby="life-title">
+              <h2 class="with-icon" id="life-title">
+                <svg class="od-icon icon" aria-hidden="true"><use href="#i-clock" /></svg>人生剩余时间
+              </h2>
+              <p class="muted">设置出生日期后，在这里查看剩余天数和整周。</p>
+              <span class="mock-field" aria-hidden="true"
+                >设置出生日期 <svg class="od-icon icon"><use href="#i-arrow" /></svg
+              ></span>
+            </section>
+          </div>
+          <section class="home-section home-continuation" aria-labelledby="continue-group">
+            <div class="entry-list">
+              <h2 id="continue-group" class="read-only-link">继续手头的事</h2>
+              <span class="read-only-link" aria-hidden="true">当前确认</span>
+              <span class="read-only-link" aria-hidden="true">任务清单</span>
+              <span class="read-only-link" aria-hidden="true">换算记录</span>
+              <button id="entry" class="secondary with-icon resume-entry" data-action="workspace">
+                <svg class="od-icon icon" aria-hidden="true"><use href="#i-loop" /></svg>继续上次<svg
+                  class="od-icon icon"
+                  aria-hidden="true"
+                >
+                  <use href="#i-arrow" />
+                </svg>
+              </button>
+            </div>
+          </section>
+          <section class="home-section panel pending home-pending" aria-labelledby="pending-title">
+            <svg class="od-icon icon muted" aria-hidden="true"><use href="#i-check" /></svg>
+            <div class="copy">
+              <p class="small muted">待确认事项</p>
+              <h2 id="pending-title">没有待确认事项</h2>
+              <p>可以记录一件需要核对条件或完成标准的事。</p>
+            </div>
+          </section>
+          <p class="home-foot">首页原有功能为背景展示。「继续上次」可进入可交互流程。</p>
+        </section>
+        <section id="workspace" hidden aria-labelledby="work-title">
+          <button class="back with-icon" data-action="home">
+            <svg class="od-icon icon"><use href="#i-back" /></svg>返回首页
+          </button>
+          <div class="page-head workspace-head">
+            <div>
+              <div class="kicker" style="margin-bottom: 8px">接续工作区</div>
+              <h1 id="work-title" tabindex="-1">继续上次</h1>
+              <p>把上次留下的进度接起来</p>
+            </div>
+          </div>
+          <div class="grid" id="tracks"></div>
+          <section class="history" aria-labelledby="history-title">
+            <div class="section-heading">
+              <h2 id="history-title" tabindex="-1">最近记录</h2>
+              <span class="small muted">按时间倒序</span>
+            </div>
+            <div class="history-tabs" role="group" aria-label="筛选最近记录">
+              <button data-filter="all" aria-pressed="true">全部</button
+              ><button data-filter="dev" aria-pressed="false">项目开发</button
+              ><button data-filter="reading" aria-pressed="false">论文阅读</button>
+            </div>
+            <div id="records"></div>
+          </section>
+        </section>
+        <details class="review" id="review">
+          <summary>评审辅助 · 提醒演示与示例状态</summary>
+          <div class="review-body">
+            <div class="review-tools">
+              <div class="actions">
+                <button data-action="remind-done">刚做完 · 提醒记录</button
+                ><button data-action="remind-return">隔几天 · 提醒继续</button>
+              </div>
+              <div class="actions">
+                <button class="text-btn" data-action="blank">空白起点</button
+                ><button class="text-btn" data-action="reset">重置示例</button>
+              </div>
+            </div>
+            <div id="reminder"></div>
+            <p class="small muted">仅供评审。真实提醒的触发、渠道和效果，需在试用中验证。</p>
+          </div>
+        </details>
+        <footer class="footer">
+          <span>RuleLoop · 交互原型</span><span id="storage-note">仅保存在当前浏览器</span>
+        </footer>
+      </main>
+    </div>
+    <nav class="bottom-nav" aria-label="移动导航（背景模块只读）">
+      <button class="nav-cell" data-action="home" aria-label="首页">
+        <svg class="od-icon icon"><use href="#i-home" /></svg><span>首页</span></button
+      ><span class="nav-cell"
+        ><svg class="od-icon icon"><use href="#i-clock" /></svg><span>待复盘</span></span
+      ><span class="nav-cell"
+        ><svg class="od-icon icon"><use href="#i-file" /></svg><span>记录</span></span
+      ><span class="nav-cell"
+        ><svg class="od-icon icon"><use href="#i-grid" /></svg><span>规则</span></span
+      ><span class="nav-cell"
+        ><svg class="od-icon icon"><use href="#i-book" /></svg><span>档案</span></span
+      >
+    </nav>
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    <dialog id="dialog" aria-labelledby="dialog-title" aria-describedby="dialog-desc">
+      <div class="dialog-inner">
+        <div class="dialog-head">
+          <h2 id="dialog-title"></h2>
+          <button class="close with-icon" aria-label="关闭对话框" data-action="close">
+            <svg class="od-icon icon"><use href="#i-close" /></svg>
+          </button>
+        </div>
+        <p class="dialog-description" id="dialog-desc"></p>
+        <form id="form" novalidate>
+          <div id="fields"></div>
+          <div class="dialog-actions">
+            <button type="button" data-action="close">取消</button
+            ><button type="button" class="primary" id="save">保存记录</button>
+          </div>
+        </form>
+      </div>
+    </dialog>
+    <script>
+      (() => {
+        'use strict';
+        const $ = (s) => document.querySelector(s),
+          esc = (s) =>
+            String(s ?? '').replace(
+              /[&<>"']/g,
+              (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+            );
+        const icon = (n) => `<svg class="od-icon icon" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+        const KEY = 'ruleloop-continue-prototype-v1';
+        let memoryOnly = false,
+          filter = 'all',
+          modal = '',
+          paperAtOpen = null,
+          focusReturn = null,
+          view = 'home',
+          homeScroll = 0,
+          timer;
+        const stamp = () => new Date().toISOString();
+        const uid = () =>
+          globalThis.crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2);
+        const seed = () => ({
+          version: 1,
+          dev: {
+            next: '用 390px 视口走一遍打卡流程',
+            records: [
+              {
+                id: 'seed-dev',
+                at: '2026-11-09T10:40:00+07:00',
+                text: '画出首页入口与两条线的流程',
+                next: '用 390px 视口走一遍打卡流程',
+                sample: true,
+              },
+            ],
+            block: null,
+          },
+          papers: [
+            {
+              id: 'ai',
+              name: '智能体的推理与行动（示例）',
+              direction: 'AI',
+              next: '',
+              records: [
+                {
+                  id: 'seed-ai',
+                  at: '2026-11-09T20:10:00+07:00',
+                  text: '读完方法概览，待看实验设置',
+                  next: '',
+                  sample: true,
+                },
+              ],
+            },
+            {
+              id: 'network',
+              name: '拥塞控制中的反馈机制（示例）',
+              direction: '计算机网络',
+              next: '',
+              records: [
+                {
+                  id: 'seed-network',
+                  at: '2026-11-07T11:30:00+07:00',
+                  text: '读完引言，标出反馈信号的定义',
+                  next: '',
+                  sample: true,
+                },
+              ],
+            },
+          ],
+          current: 'ai',
+          reminder: null,
+        });
+        let state = seed();
+        try {
+          const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+          if (saved?.version === 1 && saved.dev && Array.isArray(saved.papers)) state = saved;
+        } catch {
+          memoryOnly = true;
+        }
+        let lastQuickReading = { id: null, at: -1000 };
+        const current = () => state.papers.find((p) => p.id === state.current);
+        const date = (s) =>
+          new Date(s).toLocaleString('zh-CN', {
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Bangkok',
+          });
+        function persist() {
+          try {
+            localStorage.setItem(KEY, JSON.stringify(state));
+          } catch {
+            memoryOnly = true;
+          }
+          $('#storage-note').textContent = memoryOnly
+            ? '本地存储不可用 · 本次打开期间有效'
+            : '仅保存在当前浏览器';
+        }
+        function notify(msg) {
+          clearTimeout(timer);
+          $('#toast').textContent = msg;
+          timer = setTimeout(() => ($('#toast').textContent = ''), 4200);
+        }
+        function btn(action, label, cls = 'text-btn') {
+          return `<button type="button" class="${cls}" data-action="${action}">${label}</button>`;
+        }
+        function render() {
+          const d = state.dev,
+            p = current(),
+            last = d.records[0];
+          $('#tracks').innerHTML =
+            `<article class="panel track half" aria-labelledby="dev-title"><header class="track-head"><div><div class="kicker">01 / 开发</div><h2 id="dev-title" class="track-name">项目开发 · RuleLoop</h2></div>${icon('code')}</header><div class="project-identity"><span class="tag" style="width:max-content">当前项目</span><p>RuleLoop 账号应用</p></div><div class="focus-block"><div class="focus-label">${icon(d.next ? 'arrow' : 'check')}${d.next ? '下次先做什么' : '最近实际进度'}</div><p class="focus-title">${esc(d.next || last?.text || '从第一笔实际产出开始')}</p></div><div class="context"><span class="context-label">${d.next ? '上一笔产出' : '最近产出记录'}</span><p>${esc(d.next ? last?.text || '还没有产出记录' : last ? '已保存实际产出' : '暂无记录')}</p>${last ? `<time datetime="${last.at}">${date(last.at)}${last.sample ? ' · 示例记录' : ''}</time>` : ''}</div><div class="track-bottom"><div class="actions">${btn('dev-record', `${icon('file')} 记录开发产出`, 'primary with-icon')}</div><div class="sub-actions">${btn('dev-next', d.next ? '修改当前动作' : '写下这次先做什么')}${btn('dev-history', '查看上次记录')}${btn('block', '卡在哪？')}</div><p class="hint">卡点示例：需求模糊</p></div>${d.block ? `<section class="hypothesis"><span class="tag">待验证判断 · 不计为产出</span><h3>${esc(d.block.thought)}</h3><dl><dt>这次换个视角</dt><dd>${esc(d.block.angle)}</dd><dt>下一次怎么验证</dt><dd>${esc(d.block.verify)}</dd></dl><div class="actions" style="margin-top:16px">${btn('apply-block', '将验证动作设为下一步', 'secondary')}${btn('block', '编辑判断')}</div></section>` : ''}</article>
+<article class="panel track reading-track half" aria-labelledby="reading-title"><header class="track-head"><div><div class="kicker">02 / 阅读</div><h2 id="reading-title" class="track-name">论文阅读</h2></div>${icon('book')}</header><div class="paper-switch" role="group" aria-label="当前论文">${state.papers.map((paper) => `<button data-paper="${esc(paper.id)}" aria-pressed="${paper.id === state.current}">${esc(paper.direction)}</button>`).join('')}</div><p class="paper-title">${esc(p?.name || '尚未选择论文')}</p><div class="focus-block"><div class="focus-label">${icon(p?.next ? 'arrow' : 'book')}${p?.next ? '下次先做什么' : '最近实际进度'}</div><p class="focus-title">${esc(p?.next || p?.records[0]?.text || (p?.records.length ? '已记录一次阅读' : p ? '还没有阅读记录' : '先选一篇想继续的论文'))}</p>${p?.records[0] && !p.records[0].text && p.records.find((r) => r.text) ? `<p class="focus-note">最近留下的阅读位置 · ${date(p.records.find((r) => r.text).at)}：${esc(p.records.find((r) => r.text).text)}</p>` : `${p ? '' : '<p class="focus-note">选择示例论文，或填写自己的论文名称与方向。</p>'}`}</div><div class="context"><span class="context-label">${p?.next ? '最近实际阅读' : '最近记录'}</span><p>${esc(p?.next ? p.records[0]?.text || (p.records.length ? '已记录一次阅读' : '暂无记录') : p?.records.length ? (p.records[0].text ? '已保存阅读进度' : '已记录一次阅读') : '暂无记录')}</p>${p?.records[0] ? `<time datetime="${p.records[0].at}">${date(p.records[0].at)}${p.records[0].sample ? ' · 示例记录' : ''}</time>` : ''}</div><div class="track-bottom"><div class="actions">${btn(p ? 'quick-read' : 'paper', p ? `${icon('check')} 记一次阅读` : '选择或更换论文', 'secondary with-icon')}${p ? btn('read-record', '补充进度') : ''}</div><div class="sub-actions">${p ? btn('read-next', p.next ? '修改当前动作' : '写下这次先做什么') : ''}${btn('read-history', '查看阅读记录')}${btn('paper', '更换论文 / 方向')}</div><p class="hint">快捷记录仅保存本次阅读日期，不推断新位置。</p></div></article>`;
+          renderRecords();
+          renderReminder();
+          $('#storage-note').textContent = memoryOnly
+            ? '本地存储不可用 · 本次打开期间有效'
+            : '仅保存在当前浏览器';
+        }
+        function renderRecords() {
+          let records = [
+            ...state.dev.records.map((r) => ({ ...r, kind: 'dev', context: '项目开发 · RuleLoop' })),
+            ...state.papers.flatMap((p) =>
+              p.records.map((r) => ({
+                ...r,
+                kind: 'reading',
+                context: `论文阅读 · ${p.direction} / ${p.name}`,
+              })),
+            ),
+          ]
+            .filter((r) => filter === 'all' || r.kind === filter)
+            .sort((a, b) => new Date(b.at) - new Date(a.at));
+          $('#records').innerHTML = records.length
+            ? records
+                .map(
+                  (r) =>
+                    `<article class="record"><time datetime="${r.at}">${date(r.at)}${r.sample ? '<br>示例记录' : ''}</time><div><div class="record-kind">${esc(r.context)}</div><p>${esc(r.text || '已记录一次阅读')}</p>${r.link ? `<p style="margin-top:8px"><a href="${esc(r.link)}" target="_blank" rel="noopener noreferrer">查看产出链接 ↗</a></p>` : ''}<p class="record-next">${r.next ? '当时留下的下一步：' + esc(r.next) : '本次未填写下一步'}</p></div></article>`,
+                )
+                .join('')
+            : '<p class="empty">还没有记录。完成一次开发或阅读后，从上方留下第一笔进度。</p>';
+          document
+            .querySelectorAll('[data-filter]')
+            .forEach((b) => b.setAttribute('aria-pressed', b.dataset.filter === filter));
+        }
+        function renderReminder() {
+          const r = state.reminder;
+          $('#reminder').innerHTML = r
+            ? `<div class="notice"><span class="kicker">提醒演示</span><p class="notice-title">${r === 'done' ? '刚做完，把产出留在这里。' : '隔了几天，从上次留下的进度继续。'}</p><p class="small muted">示例提醒 · 不会发送</p><div class="actions">${btn(r === 'done' ? 'reminder-record' : 'reminder-continue', r === 'done' ? '去记录' : '继续上次', 'secondary')}${btn('dismiss-reminder', '关闭提醒')}</div></div>`
+            : '';
+        }
+        function navigate(next, push = true) {
+          if (view === 'home') homeScroll = scrollY;
+          view = next;
+          $('#home').hidden = next !== 'home';
+          $('#workspace').hidden = next !== 'workspace';
+          if (push)
+            try {
+              history.pushState({ view: next }, '', next === 'workspace' ? '#continue' : '#home');
+            } catch {}
+          window.scrollTo(0, next === 'home' ? homeScroll : 0);
+          (next === 'home' ? $('#entry') : $('#work-title')).focus({ preventScroll: true });
+        }
+        window.addEventListener('popstate', () => {
+          if ($('#dialog').open) $('#dialog').close();
+          navigate(location.hash === '#continue' ? 'workspace' : 'home', false);
+        });
+        function field(id, label, opts = {}) {
+          return `<div class="field"><label for="${id}">${label}${opts.optional ? '<span class="optional">选填</span>' : ''}</label>${opts.area ? `<textarea id="${id}" name="${id}" maxlength="1600" placeholder="${esc(opts.placeholder || '')}">${esc(opts.value || '')}</textarea>` : `<input id="${id}" name="${id}" maxlength="400" value="${esc(opts.value || '')}" placeholder="${esc(opts.placeholder || '')}" ${opts.url ? 'inputmode="url"' : ''}>`}<p class="error" role="alert" id="${id}-error" hidden></p>${opts.hint ? `<p class="hint">${opts.hint}</p>` : ''}</div>`;
+        }
+        function openModal(type) {
+          modal = type;
+          paperAtOpen = state.current;
+          focusReturn = { node: document.activeElement, action: document.activeElement?.dataset.action };
+          const p = current();
+          let title = '',
+            desc = '',
+            html = '',
+            save = '保存记录';
+          if (type === 'dev-record') {
+            title = '记录开发产出';
+            desc = '留下实际做出了什么，方便下次接着做。';
+            html =
+              field('output', '实际产出 · 必填', {
+                area: true,
+                placeholder: '例如：完成 390px 首页入口布局，并走通记录流程',
+              }) +
+              field('link', '产出链接', {
+                optional: true,
+                url: true,
+                placeholder: 'https://…',
+                hint: '选填网页链接；仅在你点击时打开。',
+              }) +
+              field('next', '下次先做什么', {
+                optional: true,
+                placeholder: '一个可以直接开始的小动作',
+                hint: '留空即清除旧下一步，以本次实际产出为主。',
+              });
+          }
+          if (type === 'dev-next') {
+            title = '这次先做什么';
+            desc = '只更新当前动作，不新增产出或阅读记录。';
+            html = field('next', '当前动作', {
+              optional: true,
+              area: true,
+              value: state.dev.next,
+              placeholder: '写下一个可以开始的小动作',
+              hint: '清空后，将显示最近实际产出。',
+            });
+            save = '保存当前动作';
+          }
+          if (type === 'read-next') {
+            title = '这次先做什么';
+            desc = p?.name || '';
+            html = field('next', '当前动作', {
+              optional: true,
+              area: true,
+              value: p?.next,
+              placeholder: '例如：核对实验中的基线方法',
+              hint: '只更新当前动作。留空保存可回到最近阅读进度。',
+            });
+            save = '保存当前动作';
+          }
+          if (type === 'read-record') {
+            title = '补充阅读进度';
+            desc = p?.name || '';
+            html =
+              field('output', '读到哪 / 有什么发现', {
+                optional: true,
+                area: true,
+                placeholder: '例如：读到实验设置，注意到对照组的差异',
+                hint: '不填写也能记录一次阅读；不会推断新的阅读位置。',
+              }) +
+              field('next', '下次先做什么', {
+                optional: true,
+                placeholder: '例如：核对实验中的基线方法',
+                hint: '留空即清除这篇论文的旧下一步。',
+              });
+          }
+          if (type === 'block') {
+            title = '卡在哪？';
+            desc = '把「需求模糊」拆成可验证的判断。这里不记录产出。';
+            const b = state.dev.block;
+            html =
+              field('thought', '目前认为卡在哪', {
+                area: true,
+                value: b?.thought,
+                placeholder: '例如：还不确定用户完成后想看到什么',
+              }) +
+              field('angle', '这次换哪个视角看', {
+                value: b?.angle,
+                placeholder: '例如：目标、使用场景、验收条件',
+              }) +
+              field('verify', '下一次怎么验证', {
+                area: true,
+                value: b?.verify,
+                placeholder: '例如：请一位同学走一遍流程，观察他能否找到下一步',
+              }) +
+              '<label class="check-row"><input type="checkbox" id="set-next"><span>同时将验证动作设为当前下一步</span></label>';
+            save = '保存待验证判断';
+          }
+          if (type === 'paper') {
+            title = '选择或更换论文';
+            desc = '选择已有论文会恢复各自进度。新增论文会保留旧记录。';
+            html = `<div class="field"><label for="paper-choice">选择论文</label><select id="paper-choice"><option value="new">新增一篇论文</option>${state.papers.map((x) => `<option value="${esc(x.id)}" ${x.id === state.current ? 'selected' : ''}>${esc(x.direction + ' · ' + x.name)}</option>`).join('')}</select></div><div id="paper-fields">${field('paper-name', '论文名称 · 必填', { value: p?.name, placeholder: '填写论文名称' })}${field('direction', '当前方向 · 必填', { value: p?.direction, placeholder: '例如：AI / 计算机网络' })}</div><p class="hint" style="margin-top:16px">修改现有论文名称与方向会保留它的历史；换读另一篇请选「新增一篇论文」。</p>`;
+            save = '保存当前论文';
+          }
+          if (type === 'reset' || type === 'blank') {
+            title = type === 'reset' ? '恢复默认示例？' : '从空白起点开始？';
+            desc = '这会清除本原型保存的记录与判断，不影响任何生产账户。';
+            html = `<p>${type === 'reset' ? '恢复开发有下一步、阅读无下一步的默认双轨。' : '清空开发进度，并取消当前论文选择。示例论文仍可选择，阅读记录将清空。'}</p>`;
+            save = type === 'reset' ? '重置示例' : '清空并开始';
+          }
+          $('#dialog-title').textContent = title;
+          $('#dialog-desc').textContent = desc;
+          $('#fields').innerHTML = html;
+          $('#save').textContent = save;
+          $('#dialog').showModal();
+          ($('#fields input, #fields textarea, #fields select') || $('#save')).focus();
+        }
+        $('#dialog').addEventListener('close', () => {
+          const target = focusReturn?.node?.isConnected
+            ? focusReturn.node
+            : document.querySelector(`[data-action="${focusReturn?.action}"]`);
+          (target || $('#work-title')).focus({ preventScroll: true });
+        });
+        $('#fields').addEventListener('change', (e) => {
+          if (e.target.id === 'paper-choice') {
+            const p = state.papers.find((x) => x.id === e.target.value);
+            $('#paper-name').value = p?.name || '';
+            $('#direction').value = p?.direction || '';
+          }
+        });
+        const value = (id) => $('#' + id)?.value.trim() || '';
+        function error(id, msg) {
+          const input = $('#' + id);
+          input.setAttribute('aria-invalid', 'true');
+          input.setAttribute('aria-describedby', id + '-error');
+          $('#' + id + '-error').hidden = false;
+          $('#' + id + '-error').textContent = msg;
+          input.focus();
+          return false;
+        }
+        function save() {
+          let feedback = '';
+          if (modal === 'dev-record') {
+            const text = value('output'),
+              link = value('link');
+            if (!text) return error('output', '请描述本次实际产出，不能只填空格。');
+            if (link) {
+              try {
+                const u = new URL(link);
+                if (!['https:', 'http:'].includes(u.protocol)) throw 0;
+              } catch {
+                return error('link', '请填写完整的 http:// 或 https:// 网页链接，或留空。');
+              }
+            }
+            const next = value('next');
+            state.dev.records.unshift({ id: uid(), at: stamp(), text, link, next });
+            state.dev.next = next;
+            feedback = '开发产出已保存';
+          }
+          if (modal === 'dev-next') {
+            state.dev.next = value('next');
+            feedback = '当前动作已更新 · 未新增产出';
+          }
+          if (modal === 'read-next') {
+            const paper = state.papers.find((x) => x.id === paperAtOpen);
+            if (!paper) return;
+            paper.next = value('next');
+            feedback = '当前动作已更新 · 未新增阅读记录';
+          }
+          if (modal === 'read-record') {
+            const p = state.papers.find((x) => x.id === paperAtOpen);
+            if (!p) return;
+            const next = value('next');
+            p.records.unshift({ id: uid(), at: stamp(), text: value('output'), next });
+            p.next = next;
+            feedback = '阅读进度已保存';
+          }
+          if (modal === 'block') {
+            for (const id of ['thought', 'angle', 'verify'])
+              if (!value(id)) return error(id, '请填写这项内容，让判断可以被验证。');
+            state.dev.block = {
+              thought: value('thought'),
+              angle: value('angle'),
+              verify: value('verify'),
+              at: stamp(),
+            };
+            if ($('#set-next').checked) state.dev.next = value('verify');
+            feedback = '待验证判断已保存 · 不计为产出';
+          }
+          if (modal === 'paper') {
+            if (!value('paper-name')) return error('paper-name', '请填写论文名称。');
+            if (!value('direction')) return error('direction', '请填写当前方向。');
+            const selected = value('paper-choice');
+            let p = state.papers.find((x) => x.id === selected);
+            if (!p) {
+              p = { id: uid(), name: '', direction: '', next: '', records: [] };
+              state.papers.push(p);
+            }
+            p.name = value('paper-name');
+            p.direction = value('direction');
+            state.current = p.id;
+            feedback = '当前论文已更新 · 旧记录已保留';
+          }
+          if (modal === 'reset') {
+            lastQuickReading = { id: null, at: -1000 };
+            state = seed();
+            filter = 'all';
+            feedback = '已恢复默认示例';
+          }
+          if (modal === 'blank') {
+            lastQuickReading = { id: null, at: -1000 };
+            state = seed();
+            state.dev = { next: '', records: [], block: null };
+            state.current = null;
+            state.papers.forEach((p) => {
+              p.records = [];
+              p.next = '';
+            });
+            filter = 'all';
+            feedback = '已切换为空白起点';
+          }
+          persist();
+          render();
+          $('#dialog').close();
+          notify(feedback);
+        }
+        $('#save').addEventListener('click', save);
+        $('#form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          save();
+        });
+        $('#form').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') {
+            e.preventDefault();
+            save();
+          }
+          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            save();
+          }
+        });
+        $('#fields').addEventListener('input', (e) => {
+          const n = $('#' + e.target.id + '-error');
+          if (n) {
+            n.hidden = true;
+            e.target.removeAttribute('aria-invalid');
+          }
+        });
+        document.addEventListener('click', (e) => {
+          const b = e.target.closest('button');
+          if (!b) return;
+          if (b.dataset.paper) {
+            state.current = b.dataset.paper;
+            persist();
+            render();
+            document.querySelector(`[data-paper="${state.current}"]`).focus();
+            notify('已切换论文，载入该论文的独立进度');
+            return;
+          }
+          if (b.dataset.filter) {
+            filter = b.dataset.filter;
+            renderRecords();
+            return;
+          }
+          const a = b.dataset.action;
+          if (a === 'reminder-continue') {
+            state.reminder = null;
+            persist();
+            renderReminder();
+            navigate('workspace');
+            return;
+          }
+          if (a === 'workspace') {
+            navigate('workspace');
+            return;
+          }
+          if (a === 'home') {
+            navigate('home');
+            return;
+          }
+          if (a === 'close') {
+            $('#dialog').close();
+            return;
+          }
+          if (
+            [
+              'dev-record',
+              'dev-next',
+              'read-next',
+              'read-record',
+              'block',
+              'paper',
+              'reset',
+              'blank',
+            ].includes(a)
+          ) {
+            openModal(a);
+            return;
+          }
+          if (a === 'reminder-record') {
+            state.reminder = null;
+            persist();
+            renderReminder();
+            navigate('workspace');
+            $('#tracks [data-action="dev-record"]').focus();
+            openModal('dev-record');
+            return;
+          }
+          if (a === 'quick-read') {
+            const p = current();
+            const now = performance.now();
+            if (!p || (lastQuickReading.id === p.id && now - lastQuickReading.at < 650)) return;
+            lastQuickReading = { id: p.id, at: now };
+            p.records.unshift({ id: uid(), at: stamp(), text: '', next: '' });
+            p.next = '';
+            persist();
+            render();
+            $('#tracks [data-action="quick-read"]').focus({ preventScroll: true });
+            notify('已记录一次阅读 · 未新增具体位置');
+            return;
+          }
+          if (a === 'apply-block') {
+            state.dev.next = state.dev.block.verify;
+            persist();
+            render();
+            $('#tracks [data-action="apply-block"]').focus({ preventScroll: true });
+            notify('验证动作已设为下一步 · 未新增产出');
+            return;
+          }
+          if (a === 'dev-history' || a === 'read-history') {
+            filter = a === 'dev-history' ? 'dev' : 'reading';
+            renderRecords();
+            $('#history-title').scrollIntoView({
+              behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+              block: 'start',
+            });
+            $('#history-title').focus({ preventScroll: true });
+            return;
+          }
+          if (a === 'remind-done' || a === 'remind-return') {
+            state.reminder = a === 'remind-done' ? 'done' : 'return';
+            persist();
+            renderReminder();
+            return;
+          }
+          if (a === 'dismiss-reminder') {
+            state.reminder = null;
+            persist();
+            renderReminder();
+            $('[data-action="remind-done"]').focus();
+            notify('示例提醒已关闭');
+          }
+        });
+        $('#side-nav').innerHTML = [
+          '档案',
+          '规则',
+          '事件',
+          '复盘',
+          '换算',
+          '证据',
+          '洞察',
+          '晨间',
+          '夜间',
+          '寿命',
+          '设置',
+        ]
+          .map(
+            (n, i) => `<span class="nav-item">${icon(['file', 'grid', 'loop', 'clock'][i % 4])}${n}</span>`,
+          )
+          .join('');
+        render();
+        if (location.hash === '#continue') navigate('workspace', false);
+        try {
+          history.replaceState({ view }, '', location.href);
+        } catch {}
+      })();
+    </script>
+  </body>
+</html>

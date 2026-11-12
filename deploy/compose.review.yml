@@ -1,0 +1,91 @@
+# Optional overlay for the VPS which hosts Ollama. Use with deploy/compose.yml.
+services:
+  review-worker:
+    image: ruleloop-app:${RELEASE_ID:?set RELEASE_ID}
+    pull_policy: never
+    command: ["node", "scripts/spending-review-worker.mjs"]
+    env_file: /opt/ruleloop/shared/review-worker.env
+    restart: unless-stopped
+    init: true
+    networks: [default, hermes-review]
+    depends_on:
+      db: {condition: service_healthy}
+      hermes-review: {condition: service_healthy}
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    read_only: true
+    stop_grace_period: 15s
+
+  hermes-review:
+    image: ${HERMES_REVIEW_IMAGE:?set the pinned VPS Hermes image}
+    user: "10000:10000"
+    init: true
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - mkdir -p /tmp/hermes-runtime && cp /etc/ruleloop/hermes-review.yaml /opt/data/config.yaml && exec hermes gateway run
+    env_file: /opt/ruleloop/shared/hermes-review.env
+    environment:
+      HOME: /opt/data
+      HERMES_HOME: /opt/data
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: "0.0.0.0"
+      API_SERVER_PORT: "8642"
+      API_SERVER_MODEL_NAME: "qwen3.5:2b-vps"
+    volumes:
+      - ./hermes-review.yaml:/etc/ruleloop/hermes-review.yaml:ro
+    tmpfs:
+      - /opt/data:uid=10000,gid=10000,mode=0700,size=128m
+      - /tmp:uid=10000,gid=10000,mode=0700,size=64m
+    extra_hosts:
+      - "review-ollama-host:${REVIEW_NETWORK_GATEWAY:?set the private Docker bridge gateway}"
+    networks: [hermes-review]
+    depends_on:
+      review-ollama-relay: {condition: service_healthy}
+    healthcheck:
+      test:
+        - CMD
+        - python3
+        - -c
+        - >-
+          import json, os, urllib.request;
+          req = urllib.request.Request("http://127.0.0.1:8642/v1/models", headers={"Authorization": "Bearer " + os.environ["API_SERVER_KEY"]});
+          assert [row["id"] for row in json.load(urllib.request.urlopen(req, timeout=3))["data"]] == ["qwen3.5:2b-vps"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    read_only: true
+    logging: {driver: "none"}
+
+  review-ollama-relay:
+    image: ruleloop-app:${RELEASE_ID:?set RELEASE_ID}
+    pull_policy: never
+    command: ["node", "scripts/spending-ollama-relay.mjs"]
+    environment:
+      REVIEW_NETWORK_GATEWAY: "${REVIEW_NETWORK_GATEWAY:?set the private Docker bridge gateway}"
+    network_mode: host
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - >-
+          fetch("http://" + process.env.REVIEW_NETWORK_GATEWAY + ":11434/v1/models", {signal: AbortSignal.timeout(3000)})
+          .then(r => r.json()).then(r => {if (!r.data.some(row => row.id === "qwen3.5:2b-vps")) process.exitCode = 1})
+          .catch(() => {process.exitCode = 1})
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+    init: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    read_only: true
+
+networks:
+  hermes-review:
+    name: ruleloop-hermes-review-private
+    external: true

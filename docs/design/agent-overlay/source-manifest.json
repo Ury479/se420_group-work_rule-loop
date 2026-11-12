@@ -1,0 +1,87 @@
+{
+  "createdAt": "2026-10-31T11:29:50.140Z",
+  "type": "design-only-static-render",
+  "readOnlySources": [
+    {
+      "file": "src/app/event-library/[id]/page.tsx",
+      "sha256": "e48e056e8228508c0c4f8cc162b627f0399559e214905d8a4dd64fc0f103e6ba"
+    },
+    {
+      "file": "src/components/app-nav.tsx",
+      "sha256": "73ca7dd58716e33520a622e3f8433182e9c3488b46b64446357e611fb5aebace"
+    },
+    {
+      "file": "src/components/app-shell.tsx",
+      "sha256": "44d41dde3913d92751ebaf69f31049145a57df7feb0d0e377bc8452cb44db5dd"
+    },
+    {
+      "file": "src/components/card-container.tsx",
+      "sha256": "0fe367bf581868535a01d48544f2e0472f756f5b08b96cde118feea97b92e845"
+    },
+    {
+      "file": "src/components/card-item.tsx",
+      "sha256": "377259731843909eb0f490df827ff3f8a3d5eba90582ea4877d816ccff8c8e40"
+    },
+    {
+      "file": "src/components/event-case-card.tsx",
+      "sha256": "104d54897afad4065f3514f897a01ccc8c861b31a58a11a4b85f8e673e4c84cb"
+    },
+    {
+      "file": "src/components/event-context-actions.tsx",
+      "sha256": "dff87e501444117af3abbf41b63b7d6079fa083c286c3cf83d79ca1c77b544ac"
+    },
+    {
+      "file": "src/components/event-status-actions.tsx",
+      "sha256": "b5875724c833357c13f06d858bccd5db53889d712b4af8bda6df934201d78d33"
+    },
+    {
+      "file": "src/components/ui/button.tsx",
+      "sha256": "94f3f0df1d8328b2566d8aa35119cd27d5c6ca89dc9962c0bafbcf4b0851086e"
+    },
+    {
+      "file": "src/components/ui/checkbox.tsx",
+      "sha256": "95c17387832b0527f5cd54623212c8494aeb248891c41207f7163a82b336cbc4"
+    },
+    {
+      "file": "src/components/ui/input.tsx",
+      "sha256": "064c589290aa236d5e7e7f32c8745a273c7c00cbb12b4966cf96e29e9a81a2ef"
+    },
+    {
+      "file": "src/components/ui/textarea.tsx",
+      "sha256": "276a7fca0a431b7af5ea9c9ddca0de298f7c303bd1f8bdf330f1414ef981d3f7"
+    },
+    {
+      "file": "src/lib/card-types.ts",
+      "sha256": "a79fd3ed12e1c093cfba198e90a96af585a2585d42c64715fb4fa1aefd879741"
+    },
+    {
+      "file": "src/lib/event-library-types.ts",
+      "sha256": "617c048880ca3995efe5c3dd7657b58a122202c7160e49cbdd130280016f068b"
+    },
+    {
+      "file": "src/lib/utils.ts",
+      "sha256": "d1f1e0d62cb8d8d1e04c26e14de842d8a151f75812d81b046c65b5d1fe8e4b27"
+    }
+  ],
+  "fixture": "Visible event /event-library/3; reviewed content copied, no API or database access",
+  "mocked": [
+    "Next navigation",
+    "all business actions",
+    "translation toggle",
+    "unused empty-review branch"
+  ],
+  "originalComponentsRendered": [
+    "event detail page",
+    "AppShell",
+    "AppNav",
+    "EventStatusActions",
+    "EventContextActions",
+    "CardContainer",
+    "Button"
+  ],
+  "limitations": [
+    "SSR snapshot, not production hydration",
+    "Agent responses are authored scenarios",
+    "Preview saves use localStorage only"
+  ]
+}

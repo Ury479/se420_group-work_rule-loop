@@ -1,0 +1,28 @@
+{
+  "protocol": "ruleloop.event-context.v1",
+  "language": "zh",
+  "currentEventRef": "source-1",
+  "profileScope": "current_event_related_cases_and_selected_rule_origins",
+  "historyScope": "recent_validated_sessions_for_selected_rules_with_exact_version_sources",
+  "sources": [
+    {
+      "ref": "source-1",
+      "kind": "event",
+      "state": "searching",
+      "version": null,
+      "fields": {
+        "title": "合成示例：准备扩展现有功能",
+        "summary": "目标尚未写清，想先对照已有复盘再决定下一步。",
+        "eventType": "project",
+        "scene": "custom"
+      },
+      "parentRefs": [],
+      "evidenceNature": "user_record",
+      "evidenceLimitations": []
+    }
+  ],
+  "ruleCandidates": [],
+  "warnings": [
+    "no_admissible_rule_candidate"
+  ]
+}

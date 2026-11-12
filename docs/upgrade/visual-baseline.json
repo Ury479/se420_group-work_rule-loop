@@ -1,0 +1,134 @@
+{
+  "results": [
+    {
+      "route": "/",
+      "width": 390,
+      "status": 200,
+      "overflow": false,
+      "title": "RuleLoop"
+    },
+    {
+      "route": "/event-library/new",
+      "width": 390,
+      "status": 200,
+      "overflow": false,
+      "title": "RuleLoop"
+    },
+    {
+      "route": "/reviews/new",
+      "width": 390,
+      "status": 200,
+      "overflow": false,
+      "title": "错误复盘 | 关键动作拦截台 · RuleLoop"
+    },
+    {
+      "route": "/convert",
+      "width": 390,
+      "status": 200,
+      "overflow": false,
+      "title": "消费换算 | 决策拦截台 · RuleLoop"
+    },
+    {
+      "route": "/rules",
+      "width": 390,
+      "status": 200,
+      "overflow": false,
+      "title": "规则库 | 关键动作拦截台 · RuleLoop"
+    },
+    {
+      "route": "/tasks",
+      "width": 390,
+      "status": 200,
+      "overflow": false,
+      "title": "关键任务分解 | 关键动作确认系统 · RuleLoop"
+    },
+    {
+      "route": "/",
+      "width": 768,
+      "status": 200,
+      "overflow": false,
+      "title": "RuleLoop"
+    },
+    {
+      "route": "/event-library/new",
+      "width": 768,
+      "status": 200,
+      "overflow": false,
+      "title": "RuleLoop"
+    },
+    {
+      "route": "/reviews/new",
+      "width": 768,
+      "status": 200,
+      "overflow": false,
+      "title": "错误复盘 | 关键动作拦截台 · RuleLoop"
+    },
+    {
+      "route": "/convert",
+      "width": 768,
+      "status": 200,
+      "overflow": false,
+      "title": "消费换算 | 决策拦截台 · RuleLoop"
+    },
+    {
+      "route": "/rules",
+      "width": 768,
+      "status": 200,
+      "overflow": false,
+      "title": "规则库 | 关键动作拦截台 · RuleLoop"
+    },
+    {
+      "route": "/tasks",
+      "width": 768,
+      "status": 200,
+      "overflow": false,
+      "title": "关键任务分解 | 关键动作确认系统 · RuleLoop"
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "status": 200,
+      "overflow": false,
+      "title": "RuleLoop"
+    },
+    {
+      "route": "/event-library/new",
+      "width": 1440,
+      "status": 200,
+      "overflow": false,
+      "title": "RuleLoop"
+    },
+    {
+      "route": "/reviews/new",
+      "width": 1440,
+      "status": 200,
+      "overflow": false,
+      "title": "错误复盘 | 关键动作拦截台 · RuleLoop"
+    },
+    {
+      "route": "/convert",
+      "width": 1440,
+      "status": 200,
+      "overflow": false,
+      "title": "消费换算 | 决策拦截台 · RuleLoop"
+    },
+    {
+      "route": "/rules",
+      "width": 1440,
+      "status": 200,
+      "overflow": false,
+      "title": "规则库 | 关键动作拦截台 · RuleLoop"
+    },
+    {
+      "route": "/tasks",
+      "width": 1440,
+      "status": 200,
+      "overflow": false,
+      "title": "关键任务分解 | 关键动作确认系统 · RuleLoop"
+    },
+    {
+      "loginKeyboardFocus": "password"
+    }
+  ],
+  "errors": []
+}

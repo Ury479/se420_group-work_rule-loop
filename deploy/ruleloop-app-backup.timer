@@ -1,0 +1,7 @@
+[Unit]
+Description=Daily RuleLoop account database backup
+[Timer]
+OnCalendar=*-*-* 03:20:00 UTC
+Persistent=true
+[Install]
+WantedBy=timers.target

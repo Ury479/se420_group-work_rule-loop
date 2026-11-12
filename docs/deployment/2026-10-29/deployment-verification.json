@@ -1,0 +1,13 @@
+{
+  "verifiedAtUTC": "2026-10-29T15:30:49.164766+00:00",
+  "url": "https://103.108.67.49",
+  "removedTemporaryAccounts": 3,
+  "containerHealth": "healthy",
+  "containerUser": "node",
+  "webImage": "sha256:f024431c2a294ae8a960088a8297e2d47e06dbb873b0ed2e9290842538c65608",
+  "migrationCredentialsInWebEnvironment": false,
+  "runtimeBaseURL": "https://103.108.67.49",
+  "independentProductionDatabase": true,
+  "existingDataImported": false,
+  "aiGatewayConfigured": false
+}

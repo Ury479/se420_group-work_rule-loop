@@ -1,0 +1,20 @@
+--- a/src/app/event-library/[id]/page.tsx
++++ b/src/app/event-library/[id]/page.tsx
+@@ -29,7 +29,7 @@
+   const data = await getEventCase(numId);
+   if (!data) notFound();
+   const { eventCase: c, reviews, rules, related } = data;
+-  const cards = await getCards("event_case", c.id);
++  const cards = await getCards("event", c.id);
+   const review = reviews[0];
+ 
+   return (
+@@ -176,7 +176,7 @@
+ 
+       {/* 卡片流挂载 */}
+       <CardContainer
+-        contextType="event_case"
++        contextType="event"
+         contextId={c.id}
+         initialCards={cards}
+       />

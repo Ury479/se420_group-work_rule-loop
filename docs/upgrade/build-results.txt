@@ -1,0 +1,101 @@
+
+> rule-loop@0.1.0 build
+> next build
+
+▲ Next.js 16.2.10 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 11.1s
+  Running TypeScript ...
+  Finished TypeScript in 7.6s ...
+  Collecting page data using 10 workers ...
+  Generating static pages using 10 workers (0/44) ...
+  Generating static pages using 10 workers (11/44) 
+  Generating static pages using 10 workers (22/44) 
+  Generating static pages using 10 workers (33/44) 
+✓ Generating static pages using 10 workers (44/44) in 424ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /api/auth/[...all]
+├ ƒ /api/dashboard/weakness-summary
+├ ƒ /api/weakness-events
+├ ƒ /api/weakness-events/[id]
+├ ƒ /api/weakness-patterns
+├ ƒ /api/weakness-patterns/[id]
+├ ƒ /api/weakness/detect
+├ ƒ /archive
+├ ƒ /arm
+├ ƒ /ash-memos
+├ ƒ /ash-memos/new
+├ ƒ /boundaries
+├ ƒ /boundaries/[id]
+├ ƒ /boundaries/[id]/check
+├ ƒ /boundaries/new
+├ ƒ /convert
+├ ƒ /convert/[id]
+├ ƒ /convert/catalog
+├ ƒ /critical-confirmations/[id]
+├ ƒ /critical-confirmations/[id]/check
+├ ƒ /critical-confirmations/[id]/evidence
+├ ƒ /critical-confirmations/new
+├ ƒ /demands
+├ ƒ /entertainment
+├ ƒ /entertainment/[id]
+├ ƒ /event-library
+├ ƒ /event-library/[id]
+├ ƒ /event-library/new
+├ ƒ /event-library/patterns
+├ ƒ /event-library/rules
+├ ƒ /event-library/search
+├ ƒ /event-library/statistics
+├ ƒ /lifespan
+├ ƒ /mind-regulation
+├ ƒ /morning-routine
+├ ƒ /night-ritual
+├ ƒ /quick-check
+├ ƒ /record
+├ ƒ /relationships
+├ ƒ /relationships/[id]
+├ ƒ /relationships/[id]/boundary-check
+├ ƒ /relationships/[id]/check
+├ ƒ /relationships/[id]/interactions
+├ ƒ /relationships/[id]/review
+├ ƒ /relationships/new
+├ ƒ /resources
+├ ƒ /resources/[id]
+├ ƒ /resources/new
+├ ƒ /resources/people
+├ ƒ /resources/people/[id]
+├ ƒ /resources/people/new
+├ ƒ /resources/plans/[id]
+├ ƒ /review
+├ ƒ /review/[id]
+├ ƒ /reviews/new
+├ ƒ /rules
+├ ƒ /rules/[id]
+├ ƒ /rules/[id]/confirm
+├ ƒ /settings
+├ ƒ /sign-in
+├ ƒ /sign-up
+├ ƒ /spending-review
+├ ƒ /spending-review/[id]
+├ ƒ /spending-review/[id]/gpt-result
+├ ƒ /spending-review/[id]/markdown
+├ ƒ /spending-review/[id]/postmortem
+├ ƒ /spending-review/anchors
+├ ƒ /spending-review/baseline
+├ ƒ /spending-review/new
+├ ƒ /spending-review/recovery
+├ ƒ /tasks
+├ ƒ /translate
+└ ƒ /weakness
+
+
+ƒ Proxy (Middleware)
+
+ƒ  (Dynamic)  server-rendered on demand
+

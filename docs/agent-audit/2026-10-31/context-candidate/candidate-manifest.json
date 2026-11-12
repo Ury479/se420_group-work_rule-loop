@@ -1,0 +1,31 @@
+{
+  "state": "candidate_not_applied",
+  "files": {
+    "src/lib/agent/event-context.ts": "1b5443e522ef39d9930a9cf60b18f36eea7330877cb2d9ac77604bd033bdeb14",
+    "src/lib/agent/event-context-repository.ts": "17f3ac6e6858212aa2187cbb0693d61fe85c376eddc3757a9495ad5a5e5bf63c",
+    "src/lib/agent/event-analysis.ts": "42a2d9c0d444a24c5d1900668fc10875e3dde06d45071d8216a1a8b209b171dc"
+  },
+  "existingDependencies": {
+    "package.json": "755235316a52ed65e70d3bf4ec184f433efbb7a2c107566c7829bdcc57039575",
+    "package-lock.json": "f4165b3794131193a56dada9f0b85864314040c54247f2d3d9cbc2f695c007ee",
+    "src/db/schema.ts": "5cdf62f6c5a755a65a41422d1af5d72073d0ff033e58025fa18318bcf2a9f2e4",
+    "src/db/index.ts": "8212900cd96a05e8d5ba2c4fb9f62b7bf15fd550e33abc1a09c43c511b6785e8",
+    "src/lib/action.ts": "8fc57c33b6c1ebc932ccfe3e1a61b14585f17bf991adf0d572b953cacd31451d",
+    "src/lib/user.ts": "52ed516bc2167428cd8297ccfbe3c21cacb483e1002b3604da6d85c5ce22b50d",
+    "src/lib/domain/experience-trigger.ts": "8cbb290b53ec286c8f9cf6a6a64d708c5b9b8c4c37fa869ff68e00aea8394c66",
+    "src/app/actions/event-library.ts": "96b450624699bfa3bc2036c184ea1b6bd75e6333a62c50e3621847fb3f8cd4dd",
+    "src/app/actions/rules.ts": "997841ac8a0d46c94170467c07371cccfeee9120fbb5ee859298dcf58e2cf66a",
+    "drizzle/0000_initial_online_schema.sql": "b8dacf0ae3e20e66a3b1d1d79008965fd37e78135ba714d6271594c148699f64",
+    "drizzle/0001_account_integrity.sql": "b3bb7871377f579a16cd040a2c0caf516f80d0f8e32824cfcd92833b28a479c8",
+    "drizzle/0002_agent_rule_sources.sql": "51123f5a70eb5b31fb01a261209013230b4c25a97970d76aa46ef8b3f90fc9ac"
+  },
+  "patchSha256": "cfa13c46361752625e6609df7a2374e68cb2e0413d585d6ee9d2305b28b4df71",
+  "validation": {
+    "tests": 66,
+    "typecheck": true
+  },
+  "noNewBusinessTables": true,
+  "noNewAuthentication": true,
+  "modelCalls": 0,
+  "productionChanges": false
+}

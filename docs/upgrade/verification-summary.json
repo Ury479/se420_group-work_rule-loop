@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "framework": {
+    "next": "16.2.10",
+    "react": "19.2.4"
+  },
+  "pages": 64,
+  "compatibilityPages": 3,
+  "tables": 63,
+  "businessTablesWithRLS": 59,
+  "ownedForeignKeys": 47,
+  "unitAndDatabaseTests": 151,
+  "aiLiveCallVerified": false,
+  "productionDeployed": false,
+  "sourceFilesReverified": 232,
+  "sourceFilesChanged": 0,
+  "browserTests": 217,
+  "fullBrowserRegression": 216,
+  "additionalEmptyAccountTest": 1,
+  "emptyWorkspacesChecked": 20,
+  "lintErrors": 0,
+  "lintWarnings": 0,
+  "typecheck": "passed",
+  "productionBuild": "passed",
+  "cleanInstall": "passed",
+  "restartPersistence": "passed",
+  "localPreview": "http://localhost:3100"
+}

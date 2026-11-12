@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN" data-ruleloop-palette="stone">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RuleLoop · 功能聚焦评审</title>
+<link rel="stylesheet" href="../../../design-system/skills/ruleloop-ui-palette/assets/palette.css">
+<style>
+*{box-sizing:border-box} [hidden]{display:none!important}
+:root{--page:var(--rl-ui-page,#fcf7f1);--paper:var(--rl-ui-surface,#fffdf9);--ink:var(--rl-ui-text,#211a16);--muted:var(--rl-ui-text-muted,#695c52);--line:var(--rl-ui-divider,#d9cfc4);--wash:var(--rl-ui-subtle,#eee8e1);--accent:var(--rl-ui-warning-text,#854624)}
+body{margin:0;background:var(--page);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:pointer} button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:3px} svg{display:block;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+h1,h2,h3,p{margin:0} h1,h2{line-height:1.25} h1{font-size:clamp(32px,4vw,52px);font-weight:650;letter-spacing:-.035em} h2{font-size:20px;letter-spacing:-.015em} h3{font-size:17px;line-height:1.4} p,.label{overflow-wrap:anywhere}
+.preview{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 18px;padding:5px max(20px,calc((100vw - 1210px)/2));border-bottom:1px solid var(--line);background:var(--paper);font-size:13px;color:var(--muted)}
+.preview p{font-weight:600}
+.switches{display:flex;flex-wrap:wrap;gap:4px}
+.switches button{background:transparent;border:1px solid transparent;border-radius:5px;padding:6px 9px;min-height:38px}
+.switches button[aria-pressed=true]{background:var(--wash);color:var(--ink);border-color:var(--line)}
+.shell{width:min(1210px,calc(100% - 48px));margin:auto;min-height:calc(100dvh - 49px);display:grid;grid-template-columns:172px minmax(0,1fr);gap:clamp(36px,6vw,94px)}
+.rail{padding-top:45px;border-right:1px solid var(--line);padding-right:20px}
+.brand{display:flex;align-items:center;gap:8px;font-size:21px;font-weight:700;letter-spacing:-.025em}
+.brand svg{width:30px;height:30px;color:var(--accent)}
+.nav{display:grid;gap:8px;margin-top:44px}
+.nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;min-height:46px;border-radius:6px;color:var(--muted)}
+.nav a:hover,.nav a[aria-current=page]{background:var(--wash);color:var(--ink)}
+.nav a[aria-current=page]{font-weight:700}
+.brand-mobile,.bottom{display:none}
+main{min-width:0;padding:62px 0 48px}
+.hero{padding-bottom:27px;border-bottom:1px solid var(--line)}
+.eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:8px;color:var(--accent);font-size:14px;font-weight:650}
+.eyebrow:before{content:"";width:14px;border-top:2px solid currentColor}
+.lead{margin-top:11px;color:var(--muted)}
+.work{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(25px,4vw,56px);padding-top:25px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.section-head .count{min-width:25px;text-align:center;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;border:1px solid var(--line);border-radius:5px}
+.start{background:var(--paper);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.start-row{display:grid;grid-template-columns:37px minmax(0,1fr) 20px;align-items:center;gap:14px;min-height:86px;padding:15px 17px}
+.start-row+.start-row{border-top:1px solid var(--line)} .start-row:hover,.queue-row:hover,.tool:hover{background:var(--wash)} .start-row:focus-visible{outline-offset:-4px}
+.icon{display:grid;place-items:center;width:37px;height:37px;border-radius:6px;background:var(--wash);color:var(--accent)}
+.small{display:block;margin-top:2px;font-size:14px;color:var(--muted)}
+.arr{color:var(--muted)}
+.jump{display:inline-flex;align-items:center;gap:7px;min-height:44px;margin-top:4px;font-size:14px;color:var(--accent);font-weight:600;text-underline-offset:3px}
+.jump:hover{text-decoration:underline}
+.jump svg{width:17px;height:17px}
+.queue-row{display:grid;grid-template-columns:minmax(0,1fr) 20px;align-items:center;gap:12px;border-top:1px solid var(--line);padding:11px 8px 11px 0;min-height:71px}
+.queue-row:last-child{border-bottom:1px solid var(--line)}
+.status{display:block;font-size:13px;color:var(--accent);font-weight:600;line-height:1.3;margin-bottom:4px}
+.queue-row strong{display:block;line-height:1.4}
+.empty{padding:17px 0;border-block:1px solid var(--line);color:var(--muted);font-size:14px}
+.history{margin-top:30px;padding-top:17px;border-top:1px solid var(--line);display:flex;align-items:center;flex-wrap:wrap;gap:4px 19px}
+.history .label{font-size:13px;color:var(--muted)} .history .jump{margin:0}
+.groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 36px;margin-top:24px}
+.group h2{margin:0 0 8px}
+.tool{min-height:44px;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--line)}
+.tool .arr{width:17px;height:17px}
+.handoff{max-width:590px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:20px;margin-top:22px}
+.handoff code{display:block;color:var(--muted);margin-top:10px;font-size:13px;overflow-wrap:anywhere}
+@media(max-width:760px){
+  .preview{padding:5px 18px;gap:2px 10px}
+  .switches button{min-height:34px;padding:4px 6px}
+  .shell{display:block;width:auto;margin:0 20px;min-height:0}
+  .rail{display:none}
+  .brand-mobile{display:flex;min-height:52px;border-bottom:1px solid var(--line);font-size:18px}
+  .brand-mobile svg{width:26px;height:26px}
+  .bottom{position:fixed;z-index:1;inset:auto 0 0;background:var(--paper);border-top:1px solid var(--line);padding:3px 10px calc(4px + env(safe-area-inset-bottom))}
+  .bottom.nav{display:grid;margin:0;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .bottom a{display:flex;flex-direction:column;justify-content:center;gap:2px;padding:3px;font-size:12px;min-height:51px}
+  .bottom svg{width:19px;height:19px}
+  main{padding:21px 0 calc(83px + env(safe-area-inset-bottom))}
+  .hero{padding-bottom:17px} .eyebrow{font-size:13px;margin-bottom:5px} .lead{font-size:14px;margin-top:6px}
+  .work{grid-template-columns:minmax(0,1fr);gap:17px;padding-top:17px}
+  .section-head{margin-bottom:8px} h2{font-size:18px}
+  .start-row{min-height:67px;gap:10px;padding:9px 11px}
+  .icon{width:34px;height:34px} .small{font-size:13px}
+  .jump{font-size:13px;margin-top:0}
+  .queue-row{min-height:56px;padding:7px 4px 7px 0}
+  .queue-row strong{font-size:15px} .status{font-size:12px}
+  .history{margin-top:12px;padding-top:6px}
+  .groups{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0">
+<symbol id="loop" viewBox="0 0 24 24"><path d="M12 12c2.1-3.2 3.4-4.6 5.6-4.6a4.6 4.6 0 0 1 0 9.2c-2.2 0-3.5-1.4-5.6-4.6Zm0 0c-2.1 3.2-3.4 4.6-5.6 4.6a4.6 4.6 0 0 1 0-9.2c2.2 0 3.5 1.4 5.6 4.6Z"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6 11v-7h6v7"/></symbol>
+<symbol id="book" viewBox="0 0 24 24"><path d="M6 3h13v18H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm-2 14h15M8 7h7m-7 4h5"/></symbol>
+<symbol id="grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></symbol>
+<symbol id="coin" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.1m11.9 0h.1"/></symbol>
+<symbol id="write" viewBox="0 0 24 24"><path d="m16 4 4 4M4 20l4-1L21 6l-3-3L5 16l-1 4Z"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+</svg>
+<div class="preview">
+  <p>评审原型 · 示例数据</p>
+  <div class="switches" role="group" aria-label="预览状态">
+    <button type="button" data-case="pending" aria-pressed="true">有待处理</button>
+    <button type="button" data-case="cooling" aria-pressed="false">冷静期中</button>
+    <button type="button" data-case="empty" aria-pressed="false">无待办</button>
+  </div>
+</div>
+<div class="shell">
+  <aside class="rail">
+    <a class="brand" href="#today"><svg aria-hidden="true"><use href="#loop"/></svg>RuleLoop</a>
+    <nav class="nav" aria-label="主导航"></nav>
+  </aside>
+  <a class="brand brand-mobile" href="#today"><svg aria-hidden="true"><use href="#loop"/></svg>RuleLoop</a>
+  <main>
+    <div id="today" data-view>
+      <header class="hero">
+        <p class="eyebrow">决策与复盘</p>
+        <h1 tabindex="-1">今天要处理什么？</h1>
+        <p class="lead">付款前想清楚，遇到事情记下来。</p>
+      </header>
+      <div class="work">
+        <section aria-labelledby="start-title">
+          <div class="section-head"><h2 id="start-title">开始一件事</h2></div>
+          <div class="start">
+            <a class="start-row" href="#convert">
+              <span class="icon"><svg aria-hidden="true"><use href="#coin"/></svg></span>
+              <span><strong>比较一笔支出</strong><span class="small">看这笔钱还能用在哪里，再决定买不买。</span></span>
+              <svg class="arr" aria-hidden="true"><use href="#arrow"/></svg>
+            </a>
+            <a class="start-row" href="#record">
+              <span class="icon"><svg aria-hidden="true"><use href="#write"/></svg></span>
+              <span><strong>记录一件事</strong><span class="small">先记下发生了什么，需要时再复盘。</span></span>
+              <svg class="arr" aria-hidden="true"><use href="#arrow"/></svg>
+            </a>
+          </div>
+          <a class="jump" href="#spending">支出审查与复盘 <svg aria-hidden="true"><use href="#arrow"/></svg></a>
+        </section>
+        <section aria-labelledby="queue-title">
+          <div class="section-head"><h2 id="queue-title">可以继续</h2><span id="queue-count" class="count"></span></div>
+          <div id="queue" aria-live="polite"></div>
+        </section>
+      </div>
+      <nav class="history" aria-label="回看">
+        <span class="label">回看</span>
+        <a class="jump" href="#events">事件库</a>
+        <a class="jump" href="#rules">规则库</a>
+        <a class="jump" href="#archive">成长档案</a>
+      </nav>
+    </div>
+    <div id="more" data-view hidden>
+      <header class="hero"><p class="eyebrow">工作区</p><h1 tabindex="-1">更多功能</h1><p class="lead">按你现在要做的事，打开对应工作区。</p></header>
+      <div id="groups" class="groups"></div>
+    </div>
+    <div id="destination" data-view hidden>
+      <header class="hero"><p class="eyebrow">入口预览</p><h1 tabindex="-1"></h1><p class="lead"></p></header>
+      <div class="handoff">
+        <p>点到这里后，正式版本会直接打开现有页面。</p>
+        <code></code>
+        <a id="actual" class="jump" target="_blank" rel="noopener">打开本机现有页面 <svg aria-hidden="true"><use href="#arrow"/></svg></a>
+      </div>
+      <a id="return-link" class="jump" href="#today">返回今天</a>
+    </div>
+  </main>
+  <nav class="nav bottom" aria-label="底部导航"></nav>
+</div>
+<script>
+const icon = (id, cls='') => '<svg class="'+cls+'" aria-hidden="true"><use href="#'+id+'"/></svg>';
+const menu = [['today','今天','home'],['events','事件','book'],['more','更多','grid']];
+const entries = {
+  convert:['消费换算','用你选的价值参照物比较这笔钱，必要时保存并开始冷静期。','/convert'],
+  record:['记录事件','记录发生了什么；可只保存，也可保存后马上复盘。','/event-library/new'],
+  events:['事件案例库','查找历史事件和未复盘的事件。','/event-library'],
+  spending:['支出审查与复盘','查看已有支出审查、作出决定，或补记事后复盘。','/spending-review'],
+  conversion:['蓝牙耳机','冷静期已结束，打开原来的换算并记录结果。','/convert/:id',false],
+  cooling:['蓝牙耳机','冷静期仍在进行；这里可回看换算和结束时间。','/convert/:id',false],
+  review:['提交报告前才发现版本不对','回到这件事，复盘风险信号、决策点和下次行动。','/reviews/new?eventId=:id',false],
+  spendingDecision:['训练课程年卡','回到原来的支出审查，记录你最终怎么决定。','/spending-review/:id',false],
+  rules:['规则库','查找可复用的规则及验证记录。','/rules'],
+  archive:['成长档案','查看已产生的复盘、换算结果和证据。','/archive'],
+  candidates:['事件候选规则','查看从事件复盘提取的候选规则。','/event-library/rules'],
+  confirmation:['待确认事项','继续未完成的检查，核对条件或补上证据。','/critical-confirmations/:id',false],
+  arm:['提前布防','为一件有风险的事准备检查条件。','/arm'],
+  check:['快速检查','在关键动作发生前检查风险。','/quick-check'],
+  tasks:['任务清单','查看、安排或完成任务。','/tasks'],
+  habits:['习惯打卡','接上上次行动，查看打卡历史。','/habits'],
+  morning:['晨间启动','进入晨间工作区。','/morning-routine'],
+  night:['夜间仪式','进入夜间工作区。','/night-ritual'],
+  lifespan:['寿命与近七天','查看长期时间和近期计划。','/lifespan'],
+  weakness:['弱点洞察','查看已识别的弱点事件。','/weakness'],
+  relationships:['人际关系','查看与人相关的记录。','/relationships'],
+  resources:['资源配置','管理资源和配置计划。','/resources'],
+  boundaries:['执行边界','设置并检查边界。','/boundaries'],
+  demands:['需求与待办','整理需求并跟进。','/demands'],
+  memos:['灰烬备忘录','查看提炼过的教训。','/ash-memos'],
+  mind:['心念调伏','查看状态与行动。','/mind-regulation'],
+  entertainment:['娱乐闭环','记录和复盘娱乐。','/entertainment'],
+  translate:['文本翻译','打开独立翻译工具。','/translate'],
+  settings:['账户与设置','管理账号和界面偏好。','/settings']
+};
+const groups = [
+  ['决策与经验',['spending','confirmation','arm','check','rules','candidates','archive','memos','weakness']],
+  ['任务与日常',['tasks','habits','morning','night','lifespan','mind','entertainment']],
+  ['关系与资源',['relationships','resources','boundaries','demands']],
+  ['工具与账户',['translate','settings']]
+];
+document.querySelectorAll('nav.nav').forEach(nav => nav.innerHTML = menu.map(([id,label,symbol]) => '<a href="#'+id+'">'+icon(symbol)+label+'</a>').join(''));
+document.getElementById('groups').innerHTML = groups.map(([label, keys]) => '<section class="group"><h2>'+label+'</h2>'+keys.map(k => '<a class="tool" href="#'+k+'" data-from="more">'+entries[k][0]+icon('arrow','arr')+'</a>').join('')+'</section>').join('');
+const queue = document.getElementById('queue');
+const count = document.getElementById('queue-count');
+const row = (to,status) => '<a class="queue-row" href="#'+to+'"><span><span class="status">'+status+'</span><strong>'+entries[to][0]+'</strong></span>'+icon('arrow','arr')+'</a>';
+function scenario(name) {
+  document.querySelectorAll('[data-case]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.case===name)));
+  const n = name==='pending'?3:0;
+  document.querySelector('.tool[href="#confirmation"]').hidden = name!=='pending';
+  count.hidden = n===0;
+  count.textContent = n;
+  count.setAttribute('aria-label',n+' 件可以继续');
+  queue.innerHTML = name==='pending'
+    ? row('conversion','冷静期已结束 · 记录结果')+row('review','事件待复盘')+row('spendingDecision','支出审查 · 待确认决定')
+    : name==='cooling'
+      ? row('cooling','冷静期中 · 11 月 12 日 19:30 结束')
+      : '<p class="empty">暂时没有要继续的支出或事件。</p>';
+}
+let fromMore = false;
+document.getElementById('groups').addEventListener('click', e => {if(e.target.closest('[data-from]')) fromMore = true});
+function show(focus) {
+  const hash = location.hash.slice(1);
+  const key = Object.hasOwn(entries,hash) ? hash : hash==='more' ? 'more' : 'today';
+  const target = key==='today'||key==='more' ? key : 'destination';
+  document.querySelectorAll('[data-view]').forEach(el => el.hidden = el.id!==target);
+  const active = key==='today' ? 'today' : ['events','record','review'].includes(key) ? 'events' : 'more';
+  document.querySelectorAll('nav.nav a').forEach(a => a.hash==='#'+active ? a.setAttribute('aria-current','page') : a.removeAttribute('aria-current'));
+  if(target==='destination') {
+    const [title, desc, path, linkable=true] = entries[key];
+    document.querySelector('#destination h1').textContent = title;
+    document.querySelector('#destination .lead').textContent = desc;
+    document.querySelector('#destination code').textContent = path;
+    const actual = document.getElementById('actual');
+    actual.href = 'http://localhost:3100'+path;
+    actual.hidden = !linkable;
+    const ret = document.getElementById('return-link');
+    ret.href = fromMore?'#more':'#today';
+    ret.textContent = fromMore?'返回更多':'返回今天';
+  } else {
+    fromMore = false;
+  }
+  if(focus) {
+    window.scrollTo(0,0);
+    document.querySelector('#'+target+' h1').focus({preventScroll:true});
+  }
+}
+document.querySelectorAll('[data-case]').forEach(b => b.addEventListener('click', () => {scenario(b.dataset.case); if (location.hash && location.hash!=='#today') location.hash='today'}));
+window.addEventListener('hashchange',()=>show(true));
+scenario('pending');
+show(false);
+</script>
+</body>
+</html>

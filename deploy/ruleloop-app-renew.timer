@@ -1,0 +1,8 @@
+[Unit]
+Description=Check RuleLoop certificate renewal twice daily
+[Timer]
+OnCalendar=*-*-* 00,12:15:00 UTC
+RandomizedDelaySec=1800
+Persistent=true
+[Install]
+WantedBy=timers.target

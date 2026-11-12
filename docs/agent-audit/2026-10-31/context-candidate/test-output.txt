@@ -1,0 +1,13 @@
+
+ RUN  v3.2.4 /Users/ury/Downloads/project/rule-loop/docs/agent-audit/2026-10-31/context-candidate
+
+ ✓ tests/event-repository.test.ts (11 tests) 1119ms
+ ✓ tests/event-analysis.test.ts (34 tests) 39ms
+ ✓ tests/event-context.test.ts (21 tests) 24ms
+
+ Test Files  3 passed (3)
+      Tests  66 passed (66)
+   Start at  19:11:51
+   Duration  2.02s (transform 156ms, setup 0ms, collect 491ms, tests 1.18s, environment 0ms, prepare 87ms)
+
+JSON report written to /Users/ury/Downloads/project/rule-loop/docs/agent-audit/2026-10-31/context-candidate/test-results.json

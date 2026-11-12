@@ -1,0 +1,105 @@
+/* RuleLoop 石白与靛夜。空属性和 stone 均启用默认石白。 */
+
+:where([data-ruleloop-palette=""], [data-ruleloop-palette="stone"]) {
+  --rl-ui-page: #FCF7F1;
+  --rl-ui-surface: #FFFDF9;
+  --rl-ui-subtle: #EEE8E1;
+  --rl-ui-text: #211A16;
+  --rl-ui-text-muted: #695C52;
+  --rl-ui-divider: #D9CFC4;
+  --rl-ui-control-border: #827367;
+  --rl-ui-action: #211A16;
+  --rl-ui-action-hover: #100D0B;
+  --rl-ui-on-action: #FFFDF9;
+  --rl-ui-accent: #A95A33;
+  --rl-ui-focus: #211A16;
+  --rl-ui-warning-text: #854624;
+  --rl-ui-success-text: #355C44;
+  --rl-ui-danger-text: #A03026;
+  --rl-ui-disabled-surface: #E5DDD4;
+  --rl-ui-disabled-text: #74685E;
+  --rl-ui-backdrop: oklch(15% .015 55 / .65);
+  --rl-ui-swatch: var(--rl-ui-accent);
+  --rl-ui-color-scheme: light;
+}
+
+:where([data-ruleloop-palette="indigo"]) {
+  --rl-ui-page: #181D2B;
+  --rl-ui-surface: #202737;
+  --rl-ui-subtle: #2B3344;
+  --rl-ui-text: #FCF7F1;
+  --rl-ui-text-muted: #C5BDB4;
+  --rl-ui-divider: #424B5D;
+  --rl-ui-control-border: #9A9EA8;
+  --rl-ui-action: #FCF7F1;
+  --rl-ui-action-hover: #FFFFFF;
+  --rl-ui-on-action: #181D2B;
+  --rl-ui-accent: #D99B73;
+  --rl-ui-focus: #FCF7F1;
+  --rl-ui-warning-text: #E6B58D;
+  --rl-ui-success-text: #AFD0B6;
+  --rl-ui-danger-text: #F3ADA0;
+  --rl-ui-disabled-surface: #323A49;
+  --rl-ui-disabled-text: #A49F9B;
+  --rl-ui-backdrop: oklch(10% .02 270 / .75);
+  --rl-ui-swatch: var(--rl-ui-accent);
+  --rl-ui-color-scheme: dark;
+}
+
+/* 旧评审稿的显式选择值，供已接入的页面继续读取。 */
+
+:where([data-ruleloop-palette="desk"]) {
+  --rl-ui-page: #f2eee5;
+  --rl-ui-surface: #faf7ef;
+  --rl-ui-subtle: #eae3d7;
+  --rl-ui-text: #241e19;
+  --rl-ui-text-muted: #635a51;
+  --rl-ui-divider: #d5cabe;
+  --rl-ui-action: #973e29;
+  --rl-ui-on-action: #fff8f2;
+  --rl-ui-warning-text: #80512e;
+  --rl-ui-swatch: #a44c36;
+  --rl-ui-color-scheme: light;
+}
+
+:where([data-ruleloop-palette="control"]) {
+  --rl-ui-page: #101720;
+  --rl-ui-surface: #18222d;
+  --rl-ui-subtle: #22313a;
+  --rl-ui-text: #eef4f5;
+  --rl-ui-text-muted: #a9b7c5;
+  --rl-ui-divider: #394957;
+  --rl-ui-action: #99e4c8;
+  --rl-ui-on-action: #112e25;
+  --rl-ui-warning-text: #f3c99c;
+  --rl-ui-swatch: #99e4c8;
+  --rl-ui-color-scheme: dark;
+}
+
+:where([data-ruleloop-palette="focus"]) {
+  --rl-ui-page: #241c22;
+  --rl-ui-surface: #30252b;
+  --rl-ui-subtle: #433038;
+  --rl-ui-text: #f8ece2;
+  --rl-ui-text-muted: #c5b0b6;
+  --rl-ui-divider: #59444d;
+  --rl-ui-action: #f0ba9f;
+  --rl-ui-on-action: #331e22;
+  --rl-ui-warning-text: #f3cc9b;
+  --rl-ui-swatch: #f0ba9f;
+  --rl-ui-color-scheme: dark;
+}
+
+:where([data-ruleloop-palette="ledger"]) {
+  --rl-ui-page: #e9ede5;
+  --rl-ui-surface: #f6f8f0;
+  --rl-ui-subtle: #dbe7d7;
+  --rl-ui-text: #202b23;
+  --rl-ui-text-muted: #505e52;
+  --rl-ui-divider: #bdc9b9;
+  --rl-ui-action: #285b43;
+  --rl-ui-on-action: #f5fbf4;
+  --rl-ui-warning-text: #7f4925;
+  --rl-ui-swatch: #56806a;
+  --rl-ui-color-scheme: light;
+}
