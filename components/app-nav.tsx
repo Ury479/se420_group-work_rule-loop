@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { Archive, BookOpen, Calculator, FileText, Folder, Home, Hourglass, Infinity, Landmark, Moon, Plus, RotateCcw, Settings, Sunrise, Zap } from "lucide-react"
 import { saveNavOrder } from "@/app/actions/preferences"
+import { ThemeSwitcher } from "@/components/theme-switcher"
 import { cn } from "@/lib/utils"
 
 export const desktopLinks = [
@@ -131,6 +132,9 @@ export function AppNav({ navOrder = null }: { navOrder?: string[] | null }) {
             )
           })}
         </nav>
+        <div className="shrink-0 border-t border-sidebar-border p-3">
+          <ThemeSwitcher />
+        </div>
       </aside>
 
       {!isFocusedMobilePage ? (

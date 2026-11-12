@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google"
 import { AppShell } from "@/components/app-shell"
 import { TranslatorProvider } from "@/components/page-translator"
+import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeScript } from "@/components/theme-script"
 import { getNavOrder } from "@/app/actions/preferences"
 import "./globals.css"
 
@@ -22,13 +24,18 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const navOrder = await getNavOrder()
   return (
     <html lang="zh-CN" className="bg-background" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} min-h-dvh bg-background font-sans text-foreground antialiased`}
       >
-        <TranslatorProvider>
-          <AppShell navOrder={navOrder}>{children}</AppShell>
-        </TranslatorProvider>
+        <ThemeProvider>
+          <TranslatorProvider>
+            <AppShell navOrder={navOrder}>{children}</AppShell>
+          </TranslatorProvider>
+        </ThemeProvider>
         {process.env.NODE_ENV === "production" ? <Analytics /> : null}
       </body>
     </html>
