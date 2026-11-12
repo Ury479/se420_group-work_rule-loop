@@ -29,22 +29,18 @@ const ids: Record<string, string> = {
 };
 for (const width of [390, 768, 1440])
   test.describe(`${width}px authenticated pages`, () => {
-    const palette = width === 768 ? "indigo" : "stone";
+    const palette = width === 768 ? "petrol" : "graphite";
     const background =
-      palette === "indigo" ? "rgb(24, 29, 43)" : "rgb(252, 247, 241)";
+      palette === "petrol" ? "rgb(12, 26, 29)" : "rgb(245, 245, 242)";
     test.use({
       storageState: ".local/browser-state.json",
       viewport: { width, height: 900 },
     });
     for (const template of pages)
-      test(template, async ({ page, baseURL }) => {
-        if (palette === "indigo") {
-          await page
-            .context()
-            .addCookies([
-              { name: "ruleloop-palette", value: palette, url: baseURL! },
-            ]);
-        }
+      test(template, async ({ page }) => {
+        await page.addInitScript(({ theme, mode }) => {
+          localStorage.setItem("ruleloop.theme.v2", JSON.stringify({ theme, mode }));
+        }, { theme: palette, mode: width === 768 ? "dark" : "light" });
         const fixtures = JSON.parse(
           readFileSync(".local/fixtures-test.json", "utf8"),
         );
@@ -91,12 +87,13 @@ for (const width of [390, 768, 1440])
 for (const route of ["/sign-in", "/sign-up"])
   for (const width of [390, 768, 1440])
     test(`public ${route} ${width}`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: "light" });
       await page.setViewportSize({ width, height: 900 });
       expect((await page.goto(route))?.status()).toBe(200);
       await expect(page.locator('input[type="email"]')).toBeVisible();
       await expect(page.locator("body")).toHaveCSS(
         "background-color",
-        "rgb(252, 247, 241)",
+        "rgb(245, 245, 242)",
       );
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth),

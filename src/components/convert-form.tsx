@@ -381,7 +381,7 @@ export function ConvertForm({
             className={cn(
               "flex min-h-14 items-center justify-center gap-2 text-sm font-semibold transition-colors focus-visible:-outline-offset-2",
               stage === "considering"
-                ? "bg-secondary text-secondary-foreground shadow-[inset_0_-2px_var(--rl-ui-accent)]"
+                ? "bg-secondary text-secondary-foreground shadow-[inset_0_-2px_var(--accent)]"
                 : "bg-card text-muted-foreground hover:text-foreground",
             )}
           >
@@ -395,7 +395,7 @@ export function ConvertForm({
             className={cn(
               "flex min-h-14 items-center justify-center gap-2 text-sm font-semibold transition-colors focus-visible:-outline-offset-2",
               stage === "spent"
-                ? "bg-secondary text-secondary-foreground shadow-[inset_0_-2px_var(--rl-ui-accent)]"
+                ? "bg-secondary text-secondary-foreground shadow-[inset_0_-2px_var(--accent)]"
                 : "bg-card text-muted-foreground hover:text-foreground",
             )}
           >

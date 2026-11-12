@@ -4,7 +4,9 @@
 // 精确匹配词条(以去除首尾空白后的整段文本为键)
 export const EXACT_DICT: Record<string, string> = {
   外观: "Appearance",
+  "石白固定为浅色，靛夜固定为深色。": "Stone White is light only; Indigo Night is dark only.",
   界面主题: "Interface theme",
+  选择色系: "Choose theme",
   主题配色: "Theme colors",
   石白: "Stone White",
   靛夜: "Indigo Night",
@@ -25,8 +27,8 @@ export const EXACT_DICT: Record<string, string> = {
   明亮清晰: "Bright and clear",
   护眼舒适: "Eye-friendly",
   自动切换: "Auto switch",
-  "主题配色包含独立的字体栈与排版样式。设置保存在浏览器本地存储中。桌面侧栏和移动端右上角的调色板按钮可快速循环切换。":
-    "Each theme includes its own font stack and typography. Settings are saved in browser local storage. Use the palette button in the desktop sidebar or mobile top-right corner to quickly cycle through themes.",
+  "主题配色包含独立的字体栈与排版样式。设置保存在浏览器本地存储中。桌面侧栏和移动端右上角的调色板按钮可打开色系列表。":
+    "Each theme includes its own font stack and typography. Settings are saved in browser local storage. Use the palette button in the desktop sidebar or mobile top-right corner to open the theme list.",
   页面未找到: "Page not found",
   全部功能: "All features",
   "按当前需要进入对应工作台。": "Open the workspace you need right now.",

@@ -123,7 +123,7 @@ export function SpendingReviewRecords({
               onClick={() =>
                 setSelection({ key: selectionKey, archived: value })
               }
-              className="min-h-9 rounded-md px-2 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-pressed:bg-card aria-pressed:font-semibold aria-pressed:text-foreground aria-pressed:shadow-[inset_0_-2px_var(--rl-ui-accent)]"
+              className="min-h-9 rounded-md px-2 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-pressed:bg-card aria-pressed:font-semibold aria-pressed:text-foreground aria-pressed:shadow-[inset_0_-2px_var(--accent)]"
             >
               {value ? "已归档" : "待处理"}
               {!value && <span className="ml-1 tabular-nums">{openCount}</span>}

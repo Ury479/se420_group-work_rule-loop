@@ -10,7 +10,7 @@
   font-size: clamp(2rem, 4vw, 3.25rem);
   font-weight: 760;
   line-height: 1.12;
-  letter-spacing: -0.04em;
+  font-family: var(--rl-font-display);
 }
 .workspace h2,
 .dialog h3 {
@@ -48,14 +48,15 @@
   color: var(--primary-foreground);
 }
 .primary:enabled:hover {
-  background: var(--rl-ui-action-hover);
+  background: var(--primary-hover);
 }
 .secondary {
-  background: var(--secondary);
-  color: var(--secondary-foreground);
+  background: var(--surface);
+  border: 1px solid var(--control);
+  color: var(--text);
 }
 .secondary:enabled:hover {
-  background: color-mix(in oklab, var(--foreground) 8%, var(--secondary));
+  background: var(--surface-2);
 }
 .quiet {
   color: var(--muted-foreground);
@@ -115,7 +116,7 @@
 .heatmap {
   --checkin-empty: var(--muted);
   --checkin-one: color-mix(in oklab, var(--success) 28%, var(--card));
-  --checkin-many: color-mix(in oklab, var(--success) 64%, var(--card));
+  --checkin-many: var(--success);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
   align-items: center;
@@ -214,7 +215,7 @@
   border-radius: 8px;
   background: var(--primary);
   color: var(--primary-foreground);
-  box-shadow: 0 3px 10px var(--rl-ui-shadow);
+  box-shadow: var(--shadow);
   font-size: 0.75rem;
   line-height: 1.4;
   text-align: center;
@@ -283,8 +284,12 @@
   min-width: 0;
 }
 .nextLabel {
+  width: fit-content;
+  border-radius: 4px;
+  padding-inline: 5px;
+  background: var(--mark);
   font-size: 0.8125rem;
-  color: var(--foreground);
+  color: var(--text);
   font-weight: 650;
 }
 .focus {
@@ -338,7 +343,7 @@
   grid-column: 1 / -1;
   padding: 10px 13px;
   border-radius: 12px;
-  background: color-mix(in oklab, var(--warning) 8%, var(--card));
+  background: var(--warn-soft);
   border: 1px solid color-mix(in oklab, var(--warning) 34%, var(--border));
 }
 .breakpoint summary {

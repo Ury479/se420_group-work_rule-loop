@@ -1,169 +1,103 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-
-type Theme = "stone" | "indigo" | "graphite" | "petrol" | "wine"
-type Mode = "light" | "dark" | "system"
+import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
+import {
+  DEFAULT_THEME,
+  THEME_STORAGE_KEY,
+  resolveMode,
+  type Mode,
+  type ResolvedMode,
+  type Theme,
+} from "@/lib/ruleloop-palette";
 
 interface ThemeContext {
-  theme: Theme
-  mode: Mode
-  setTheme: (theme: Theme) => void
-  setMode: (mode: Mode) => void
-  cycleTheme: () => void
-  resolvedMode: "light" | "dark"
+  theme: Theme;
+  mode: Mode;
+  resolvedMode: ResolvedMode;
+  setTheme: (theme: Theme) => void;
+  setMode: (mode: Mode) => void;
 }
 
-const ThemeContext = createContext<ThemeContext | undefined>(undefined)
+const ThemeContext = createContext<ThemeContext | undefined>(undefined);
+const systemQuery = "(prefers-color-scheme: dark)";
+const changeEvent = "ruleloop:theme";
+let transitionTimer: number | undefined;
 
-const STORAGE_KEY = "ruleloop.theme.v2"
-const THEME_ORDER: Theme[] = ["stone", "indigo", "graphite", "petrol", "wine"]
-
-function parseTheme(value: unknown): Theme {
-  return THEME_ORDER.includes(value as Theme) ? (value as Theme) : "stone"
+function getServerSnapshot() {
+  return `${DEFAULT_THEME}:system:light`;
 }
 
-function parseMode(value: unknown): Mode {
-  const validModes: Mode[] = ["light", "dark", "system"]
-  return validModes.includes(value as Mode) ? (value as Mode) : "light"
+function getSnapshot() {
+  const { theme, themeMode, mode } = document.documentElement.dataset;
+  return `${theme ?? DEFAULT_THEME}:${themeMode ?? "system"}:${mode ?? "light"}`;
 }
 
-function getSystemMode(): "light" | "dark" {
-  if (typeof window === "undefined") return "dark"
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
+function currentPreference() {
+  return getSnapshot().split(":") as [Theme, Mode, ResolvedMode];
 }
 
-// 迁移旧值：保持用户原选择
-function migrateOldSettings() {
-  if (typeof window === "undefined") return null
-
-  try {
-    // 检查旧cookie值
-    const cookies = document.cookie.split(';')
-    const paletteCookie = cookies.find(c => c.trim().startsWith('ruleloop-palette='))
-    
-    if (paletteCookie) {
-      const value = paletteCookie.split('=')[1]
-      let migratedTheme: Theme = "stone"
-
-      // 直接映射旧值
-      if (value === "stone" || value === "") {
-        migratedTheme = "stone"
-      } else if (value === "indigo") {
-        migratedTheme = "indigo"
-      }
-
-      const migrated = { theme: migratedTheme, mode: "light" as Mode }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated))
-      
-      // 删除旧cookie
-      document.cookie = "ruleloop-palette=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-      
-      return migrated
-    }
-  } catch {
-    // 静默失败
+function applyTheme(theme: Theme, mode: Mode, persist: boolean) {
+  const root = document.documentElement;
+  const resolved = resolveMode(theme, mode, matchMedia(systemQuery).matches);
+  if (
+    (root.dataset.theme !== theme || root.dataset.mode !== resolved) &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    root.dataset.themeTransition = "";
+    window.clearTimeout(transitionTimer);
+    transitionTimer = window.setTimeout(() => {
+      delete root.dataset.themeTransition;
+    }, 220);
   }
-  return null
+  root.dataset.theme = theme;
+  root.dataset.themeMode = mode;
+  root.dataset.mode = resolved;
+  if (persist) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify({ theme, mode }));
+    } catch {
+      // Appearance still changes when browser storage is unavailable.
+    }
+  }
+  window.dispatchEvent(new Event(changeEvent));
 }
 
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "stone"
-  try {
-    const migrated = migrateOldSettings()
-    if (migrated) return migrated.theme
-
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      const parsed = JSON.parse(stored)
-      return parseTheme(parsed.theme)
-    }
-  } catch {
-    // 静默回退
-  }
-  return "stone"
-}
-
-function getInitialMode(): Mode {
-  if (typeof window === "undefined") return "light"
-  try {
-    const migrated = migrateOldSettings()
-    if (migrated) return migrated.mode
-
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      const parsed = JSON.parse(stored)
-      return parseMode(parsed.mode)
-    }
-  } catch {
-    // 静默回退
-  }
-  return "light"
+function subscribe(notify: () => void) {
+  const media = matchMedia(systemQuery);
+  const updateSystemMode = () => {
+    const [theme, mode] = currentPreference();
+    if (mode === "system") applyTheme(theme, mode, false);
+  };
+  window.addEventListener(changeEvent, notify);
+  media.addEventListener("change", updateSystemMode);
+  return () => {
+    window.removeEventListener(changeEvent, notify);
+    media.removeEventListener("change", updateSystemMode);
+  };
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme)
-  const [mode, setModeState] = useState<Mode>(getInitialMode)
-  const [resolvedMode, setResolvedMode] = useState<"light" | "dark">(() =>
-    typeof window === "undefined" ? "dark" : getSystemMode()
-  )
-
-  useEffect(() => {
-    const updateSystemMode = () => {
-      setResolvedMode(getSystemMode())
-    }
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)")
-    mediaQuery.addEventListener("change", updateSystemMode)
-    return () => mediaQuery.removeEventListener("change", updateSystemMode)
-  }, [])
-
-  useEffect(() => {
-    const resolved = mode === "system" ? getSystemMode() : mode
-    document.documentElement.setAttribute("data-theme", theme)
-    document.documentElement.setAttribute("data-mode", resolved)
-  }, [theme, mode])
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      const current = stored ? JSON.parse(stored) : {}
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, theme: newTheme }))
-    } catch {
-      // 静默失败
-    }
-  }
-
-  const setMode = (newMode: Mode) => {
-    setModeState(newMode)
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      const current = stored ? JSON.parse(stored) : {}
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, mode: newMode }))
-    } catch {
-      // 静默失败
-    }
-  }
-
-  const cycleTheme = () => {
-    const currentIndex = THEME_ORDER.indexOf(theme)
-    const nextIndex = (currentIndex + 1) % THEME_ORDER.length
-    const nextTheme = THEME_ORDER[nextIndex]
-    setTheme(nextTheme)
-  }
+  const [theme, mode, resolvedMode] = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  ).split(":") as [Theme, Mode, ResolvedMode];
 
   return (
-    <ThemeContext.Provider value={{ theme, mode, setTheme, setMode, cycleTheme, resolvedMode }}>
+    <ThemeContext.Provider value={{
+      theme,
+      mode,
+      resolvedMode,
+      setTheme: (next) => applyTheme(next, currentPreference()[1], true),
+      setMode: (next) => applyTheme(currentPreference()[0], next, true),
+    }}>
       {children}
     </ThemeContext.Provider>
-  )
+  );
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext)
-  if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider")
-  }
-  return context
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("useTheme must be used within ThemeProvider");
+  return context;
 }

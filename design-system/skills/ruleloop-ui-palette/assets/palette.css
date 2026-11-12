@@ -1,30 +1,253 @@
-/* RuleLoop 五套主题系统 */
-/* 用法：<html data-theme="stone|indigo|graphite|petrol|wine" data-mode="light|dark"> */
-/* 默认：石白(stone) */
-
-/* 字体排版基础 */
+/* Canonical RuleLoop theme tokens. Graphite, Petrol and Wine follow ruleloop-theme-palettes. */
 :root {
-  --text-display: clamp(34px, 4.4vw, 60px);
-  --leading-display: 1.22;
-  --text-h1: clamp(28px, 3.2vw, 40px);
-  --leading-h1: 1.3;
-  --text-h2: 24px;
-  --leading-h2: 1.35;
-  --text-h3: 18px;
-  --leading-h3: 1.5;
-  --text-body: 16px;
-  --leading-body: 1.7;
-  --text-sm: 14px;
-  --leading-sm: 1.65;
-  --text-xs: 13px;
-  --leading-xs: 1.6;
-  --text-label: 12px;
-  --leading-label: 1.5;
+  --rl-font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+  --text-display: clamp(34px, 4.4vw, 60px); --leading-display: 1.22;
+  --text-h1: clamp(28px, 3.2vw, 40px); --leading-h1: 1.3;
+  --text-h2: 24px; --leading-h2: 1.35;
+  --text-h3: 18px; --leading-h3: 1.5;
+  --text-body: 16px; --leading-body: 1.7;
+  --text-sm: 14px; --leading-sm: 1.65;
+  --text-xs: 13px; --leading-xs: 1.6;
+  --text-label: 12px; --leading-label: 1.5;
 }
 
-/* 1. 石白 (Stone) - 原始浅色主题，默认 */
-:root,
-:root[data-theme="stone"] {
+/* ---- A 铅灰 · 荧光批注 ---- */
+:root[data-theme="graphite"], :root {
+  --rl-font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --rl-font-sans: "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --rl-font-latin: "SF Pro Display", -apple-system, "Helvetica Neue", Inter, Arial, sans-serif;
+  --display-weight: 650;
+  --display-tracking: -0.02em;
+  --latin-style: normal;
+}
+:root, :root[data-theme="graphite"][data-mode="light"], :root[data-theme="graphite"]:not([data-mode="dark"]), [data-theme-preview="graphite"] {
+  --bg: #F5F5F2;
+  --surface: #FFFFFF;
+  --surface-2: #EBEBE6;
+  --text: #1D1D1F;
+  --text-2: #55555A;
+  --text-3: #66666B;
+  --line: #DCDCD6;
+  --control: #86868B;
+  --primary: #1D1D1F;
+  --on-primary: #FFFFFF;
+  --primary-hover: #000000;
+  --accent: #E3F25B;
+  --on-accent: #1D1D1F;
+  --accent-soft: #F1F8B4;
+  --accent-text: #4F5E00;
+  --mark: #E3F25B;
+  --link: #1D1D1F;
+  --success: #1C7A43;
+  --success-soft: #E3F2E8;
+  --warn: #965400;
+  --warn-soft: #FBEFD9;
+  --danger: #C0352B;
+  --danger-soft: #FBE6E3;
+  --focus: #1D1D1F;
+  --chart-1: #1D1D1F;
+  --chart-2: #7D8C00;
+  --chart-3: #3F6FD1;
+  --chart-4: #B86F14;
+  --chart-5: #8E8E93;
+  --shadow: 0 18px 50px -24px rgb(20 20 20 / .28);
+  --backdrop: rgb(20 18 20 / .42);
+  color-scheme: light;
+}
+:root[data-theme="graphite"][data-mode="dark"], :root:not([data-theme])[data-mode="dark"] {
+  --bg: #111113;
+  --surface: #1B1B1E;
+  --surface-2: #26262A;
+  --text: #F2F2EE;
+  --text-2: #AEAEB3;
+  --text-3: #8E8E93;
+  --line: #313136;
+  --control: #75757C;
+  --primary: #DDEE55;
+  --on-primary: #151515;
+  --primary-hover: #E8F57A;
+  --accent: #DDEE55;
+  --on-accent: #151515;
+  --accent-soft: #2A2F12;
+  --accent-text: #DDEE55;
+  --mark: #47521A;
+  --link: #E6F37A;
+  --success: #5CCB8A;
+  --success-soft: #14291C;
+  --warn: #EDB65F;
+  --warn-soft: #2E2412;
+  --danger: #FF8B7E;
+  --danger-soft: #341A17;
+  --focus: #DDEE55;
+  --chart-1: #F2F2EE;
+  --chart-2: #DDEE55;
+  --chart-3: #7FA6F0;
+  --chart-4: #EDB65F;
+  --chart-5: #6E6E75;
+  --shadow: 0 18px 60px -20px rgb(0 0 0 / .7);
+  --backdrop: rgb(0 0 0 / .62);
+  color-scheme: dark;
+}
+
+/* ---- B 石油蓝 · 赭石账簿 ---- */
+:root[data-theme="petrol"] {
+  --rl-font-display: Charter, "Bitstream Charter", "Songti SC", "Noto Serif SC", "Source Han Serif SC", STSong, "SimSun", serif;
+  --rl-font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --rl-font-latin: Charter, "Bitstream Charter", Georgia, serif;
+  --display-weight: 600;
+  --display-tracking: -0.01em;
+  --latin-style: italic;
+}
+:root[data-theme="petrol"][data-mode="light"], :root[data-theme="petrol"]:not([data-mode="dark"]), [data-theme-preview="petrol"] {
+  --bg: #F1F0EA;
+  --surface: #FBFAF6;
+  --surface-2: #E6E4DA;
+  --text: #132629;
+  --text-2: #465659;
+  --text-3: #56676A;
+  --line: #D4D1C5;
+  --control: #7A8683;
+  --primary: #0D4C55;
+  --on-primary: #F8F6EF;
+  --primary-hover: #083E46;
+  --accent: #B98222;
+  --on-accent: #1A1305;
+  --accent-soft: #F3E7CB;
+  --accent-text: #86590A;
+  --mark: #EFD9A6;
+  --link: #0D5A64;
+  --success: #2D6A3E;
+  --success-soft: #E2EEE3;
+  --warn: #A2460E;
+  --warn-soft: #F8E6D8;
+  --danger: #B0213A;
+  --danger-soft: #F7E1E4;
+  --focus: #0D4C55;
+  --chart-1: #0D4C55;
+  --chart-2: #B98222;
+  --chart-3: #4F8C85;
+  --chart-4: #A2460E;
+  --chart-5: #85908D;
+  --shadow: 0 18px 50px -24px rgb(20 20 20 / .28);
+  --backdrop: rgb(20 18 20 / .42);
+  color-scheme: light;
+}
+:root[data-theme="petrol"][data-mode="dark"] {
+  --bg: #0C1A1D;
+  --surface: #122428;
+  --surface-2: #1A3135;
+  --text: #E9EFEB;
+  --text-2: #A3B6B4;
+  --text-3: #8AA09E;
+  --line: #28403F;
+  --control: #5E7B7C;
+  --primary: #E2B65C;
+  --on-primary: #1C1406;
+  --primary-hover: #ECC77C;
+  --accent: #E2B65C;
+  --on-accent: #1C1406;
+  --accent-soft: #2B2614;
+  --accent-text: #E2B65C;
+  --mark: #4A3A16;
+  --link: #86CBCB;
+  --success: #7CCB93;
+  --success-soft: #132B1D;
+  --warn: #F0A06A;
+  --warn-soft: #33200F;
+  --danger: #F58C9A;
+  --danger-soft: #361920;
+  --focus: #E2B65C;
+  --chart-1: #86CBCB;
+  --chart-2: #E2B65C;
+  --chart-3: #4F9A90;
+  --chart-4: #F0A06A;
+  --chart-5: #5E7B7C;
+  --shadow: 0 18px 60px -20px rgb(0 0 0 / .7);
+  --backdrop: rgb(0 0 0 / .62);
+  color-scheme: dark;
+}
+
+/* ---- C 酒红 · 雾灰批注 ---- */
+:root[data-theme="wine"] {
+  --rl-font-display: "Iowan Old Style", "Kaiti SC", "LXGW WenKai", STKaiti, KaiTi, "Noto Serif SC", serif;
+  --rl-font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --rl-font-latin: "Iowan Old Style", "Palatino", Georgia, serif;
+  --display-weight: 600;
+  --display-tracking: 0;
+  --latin-style: italic;
+}
+:root[data-theme="wine"][data-mode="light"], :root[data-theme="wine"]:not([data-mode="dark"]), [data-theme-preview="wine"] {
+  --bg: #F2F1F3;
+  --surface: #FFFFFF;
+  --surface-2: #E7E5E9;
+  --text: #221A1E;
+  --text-2: #5A5056;
+  --text-3: #6A6066;
+  --line: #DAD6DB;
+  --control: #877E84;
+  --primary: #7A1C31;
+  --on-primary: #FFF8F8;
+  --primary-hover: #651426;
+  --accent: #7A1C31;
+  --on-accent: #FFF8F8;
+  --accent-soft: #F4E3E6;
+  --accent-text: #7A1C31;
+  --mark: #F0CDD5;
+  --link: #7A1C31;
+  --success: #2F6B4C;
+  --success-soft: #E3F0E8;
+  --warn: #8E5A00;
+  --warn-soft: #F7EDD8;
+  --danger: #C02A1E;
+  --danger-soft: #FBE4E1;
+  --focus: #7A1C31;
+  --chart-1: #7A1C31;
+  --chart-2: #4F6F86;
+  --chart-3: #A57645;
+  --chart-4: #8E5A00;
+  --chart-5: #8F868C;
+  --shadow: 0 18px 50px -24px rgb(20 20 20 / .28);
+  --backdrop: rgb(20 18 20 / .42);
+  color-scheme: light;
+}
+:root[data-theme="wine"][data-mode="dark"] {
+  --bg: #161214;
+  --surface: #201A1D;
+  --surface-2: #2C2428;
+  --text: #F3ECEE;
+  --text-2: #B8AAB0;
+  --text-3: #9C8F95;
+  --line: #3A3035;
+  --control: #7C6E75;
+  --primary: #E8A0AE;
+  --on-primary: #2A0D14;
+  --primary-hover: #F0B8C3;
+  --accent: #E8A0AE;
+  --on-accent: #2A0D14;
+  --accent-soft: #3A1F27;
+  --accent-text: #E8A0AE;
+  --mark: #552634;
+  --link: #F0B3BF;
+  --success: #86C9A2;
+  --success-soft: #162A1F;
+  --warn: #E8BA6E;
+  --warn-soft: #2F2413;
+  --danger: #FF8E80;
+  --danger-soft: #3A1A17;
+  --focus: #E8A0AE;
+  --chart-1: #E8A0AE;
+  --chart-2: #8FB3CC;
+  --chart-3: #D6AE80;
+  --chart-4: #E8BA6E;
+  --chart-5: #7C6E75;
+  --shadow: 0 18px 60px -20px rgb(0 0 0 / .7);
+  --backdrop: rgb(0 0 0 / .62);
+  color-scheme: dark;
+}
+
+/* 1. 石白 (Stone) - 经典浅色 */
+:root[data-theme="stone"],
+:root:not([data-theme])[data-ruleloop-palette="stone"], [data-theme-preview="stone"] {
   --bg: #FCF7F1;
   --surface: #FFFDF9;
   --surface-2: #EEE8E1;
@@ -40,7 +263,7 @@
   --on-accent: #FFFDF9;
   --accent-soft: #F5E6DC;
   --accent-text: #A95A33;
-  --mark: #A95A33;
+  --mark: #F5E6DC;
   --link: #211A16;
   --success: #355C44;
   --success-soft: #E8F2EC;
@@ -60,7 +283,8 @@
 }
 
 /* 2. 靛夜 (Indigo) - 原始深色主题 */
-:root[data-theme="indigo"] {
+:root[data-theme="indigo"],
+:root:not([data-theme])[data-ruleloop-palette="indigo"], [data-theme-preview="indigo"] {
   --bg: #181D2B;
   --surface: #202737;
   --surface-2: #2B3344;
@@ -76,7 +300,7 @@
   --on-accent: #181D2B;
   --accent-soft: #3A3028;
   --accent-text: #D99B73;
-  --mark: #D99B73;
+  --mark: #3A3028;
   --link: #D99B73;
   --success: #AFD0B6;
   --success-soft: #1F2B24;
@@ -95,299 +319,14 @@
   color-scheme: dark;
 }
 
-/* 3. 铅灰·荧光批注 (Graphite) */
-:root[data-theme="graphite"] {
-  --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC",
-    "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  --font-sans: "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "MiSans",
-    "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  --font-latin: "SF Pro Display", -apple-system, "Helvetica Neue", Inter, Arial, sans-serif;
-  --display-weight: 650;
-  --display-tracking: -0.02em;
-  --latin-style: normal;
-}
-
-:root[data-theme="graphite"][data-mode="light"],
-:root[data-theme="graphite"]:not([data-mode="dark"]) {
-  --bg: #f5f5f2;
-  --surface: #ffffff;
-  --surface-2: #ebebe6;
-  --text: #1d1d1f;
-  --text-2: #55555a;
-  --text-3: #66666b;
-  --line: #dcdcd6;
-  --control: #86868b;
-  --primary: #1d1d1f;
-  --on-primary: #ffffff;
-  --primary-hover: #000000;
-  --accent: #e3f25b;
-  --on-accent: #1d1d1f;
-  --accent-soft: #f1f8b4;
-  --accent-text: #4f5e00;
-  --mark: #e3f25b;
-  --link: #1d1d1f;
-  --success: #1c7a43;
-  --success-soft: #e3f2e8;
-  --warn: #965400;
-  --warn-soft: #fbefd9;
-  --danger: #c0352b;
-  --danger-soft: #fbe6e3;
-  --focus: #1d1d1f;
-  --chart-1: #1d1d1f;
-  --chart-2: #7d8c00;
-  --chart-3: #3f6fd1;
-  --chart-4: #b86f14;
-  --chart-5: #8e8e93;
-  --shadow: 0 18px 50px -24px rgb(20 20 20 / 0.28);
-  --backdrop: rgb(20 18 20 / 0.42);
-  color-scheme: light;
-}
-
-:root[data-theme="graphite"][data-mode="dark"] {
-  --bg: #111113;
-  --surface: #1b1b1e;
-  --surface-2: #26262a;
-  --text: #f2f2ee;
-  --text-2: #aeaeb3;
-  --text-3: #8e8e93;
-  --line: #313136;
-  --control: #75757c;
-  --primary: #ddee55;
-  --on-primary: #151515;
-  --primary-hover: #e8f57a;
-  --accent: #ddee55;
-  --on-accent: #151515;
-  --accent-soft: #2a2f12;
-  --accent-text: #ddee55;
-  --mark: #47521a;
-  --link: #e6f37a;
-  --success: #5ccb8a;
-  --success-soft: #14291c;
-  --warn: #edb65f;
-  --warn-soft: #2e2412;
-  --danger: #ff8b7e;
-  --danger-soft: #341a17;
-  --focus: #ddee55;
-  --chart-1: #f2f2ee;
-  --chart-2: #ddee55;
-  --chart-3: #7fa6f0;
-  --chart-4: #edb65f;
-  --chart-5: #6e6e75;
-  --shadow: 0 18px 60px -20px rgb(0 0 0 / 0.7);
-  --backdrop: rgb(0 0 0 / 0.62);
-  color-scheme: dark;
-}
-
-/* 4. 石油蓝·赭石账簿 (Petrol) */
-:root[data-theme="petrol"] {
-  --font-display: Charter, "Bitstream Charter", "Songti SC", "Noto Serif SC", "Source Han Serif SC", STSong,
-    "SimSun", serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Noto Sans SC",
-    "Microsoft YaHei", sans-serif;
-  --font-latin: Charter, "Bitstream Charter", Georgia, serif;
-  --display-weight: 600;
-  --display-tracking: -0.01em;
-  --latin-style: italic;
-}
-
-:root[data-theme="petrol"][data-mode="light"],
-:root[data-theme="petrol"]:not([data-mode="dark"]) {
-  --bg: #f1f0ea;
-  --surface: #fbfaf6;
-  --surface-2: #e6e4da;
-  --text: #132629;
-  --text-2: #465659;
-  --text-3: #56676a;
-  --line: #d4d1c5;
-  --control: #7a8683;
-  --primary: #0d4c55;
-  --on-primary: #f8f6ef;
-  --primary-hover: #083e46;
-  --accent: #b98222;
-  --on-accent: #1a1305;
-  --accent-soft: #f3e7cb;
-  --accent-text: #86590a;
-  --mark: #efd9a6;
-  --link: #0d5a64;
-  --success: #2d6a3e;
-  --success-soft: #e2eee3;
-  --warn: #a2460e;
-  --warn-soft: #f8e6d8;
-  --danger: #b0213a;
-  --danger-soft: #f7e1e4;
-  --focus: #0d4c55;
-  --chart-1: #0d4c55;
-  --chart-2: #b98222;
-  --chart-3: #4f8c85;
-  --chart-4: #a2460e;
-  --chart-5: #85908d;
-  --shadow: 0 18px 50px -24px rgb(20 20 20 / 0.28);
-  --backdrop: rgb(20 18 20 / 0.42);
-  color-scheme: light;
-}
-
-:root[data-theme="petrol"][data-mode="dark"] {
-  --bg: #0c1a1d;
-  --surface: #122428;
-  --surface-2: #1a3135;
-  --text: #e9efeb;
-  --text-2: #a3b6b4;
-  --text-3: #8aa09e;
-  --line: #28403f;
-  --control: #5e7b7c;
-  --primary: #e2b65c;
-  --on-primary: #1c1406;
-  --primary-hover: #ecc77c;
-  --accent: #e2b65c;
-  --on-accent: #1c1406;
-  --accent-soft: #2b2614;
-  --accent-text: #e2b65c;
-  --mark: #4a3a16;
-  --link: #86cbcb;
-  --success: #7ccb93;
-  --success-soft: #132b1d;
-  --warn: #f0a06a;
-  --warn-soft: #33200f;
-  --danger: #f58c9a;
-  --danger-soft: #361920;
-  --focus: #e2b65c;
-  --chart-1: #86cbcb;
-  --chart-2: #e2b65c;
-  --chart-3: #4f9a90;
-  --chart-4: #f0a06a;
-  --chart-5: #5e7b7c;
-  --shadow: 0 18px 60px -20px rgb(0 0 0 / 0.7);
-  --backdrop: rgb(0 0 0 / 0.62);
-  color-scheme: dark;
-}
-
-/* 5. 酒红·雾灰批注 (Wine) */
-:root[data-theme="wine"] {
-  --font-display: "Iowan Old Style", "Kaiti SC", "LXGW WenKai", STKaiti, KaiTi, "Noto Serif SC", serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Noto Sans SC",
-    "Microsoft YaHei", sans-serif;
-  --font-latin: "Iowan Old Style", "Palatino", Georgia, serif;
-  --display-weight: 600;
-  --display-tracking: 0;
-  --latin-style: italic;
-}
-
-:root[data-theme="wine"][data-mode="light"],
-:root[data-theme="wine"]:not([data-mode="dark"]) {
-  --bg: #f2f1f3;
-  --surface: #ffffff;
-  --surface-2: #e7e5e9;
-  --text: #221a1e;
-  --text-2: #5a5056;
-  --text-3: #6a6066;
-  --line: #dad6db;
-  --control: #877e84;
-  --primary: #7a1c31;
-  --on-primary: #fff8f8;
-  --primary-hover: #651426;
-  --accent: #7a1c31;
-  --on-accent: #fff8f8;
-  --accent-soft: #f4e3e6;
-  --accent-text: #7a1c31;
-  --mark: #f0cdd5;
-  --link: #7a1c31;
-  --success: #2f6b4c;
-  --success-soft: #e3f0e8;
-  --warn: #8e5a00;
-  --warn-soft: #f7edd8;
-  --danger: #c02a1e;
-  --danger-soft: #fbe4e1;
-  --focus: #7a1c31;
-  --chart-1: #7a1c31;
-  --chart-2: #4f6f86;
-  --chart-3: #a57645;
-  --chart-4: #8e5a00;
-  --chart-5: #8f868c;
-  --shadow: 0 18px 50px -24px rgb(20 20 20 / 0.28);
-  --backdrop: rgb(20 18 20 / 0.42);
-  color-scheme: light;
-}
-
-:root[data-theme="wine"][data-mode="dark"] {
-  --bg: #161214;
-  --surface: #201a1d;
-  --surface-2: #2c2428;
-  --text: #f3ecee;
-  --text-2: #b8aab0;
-  --text-3: #9c8f95;
-  --line: #3a3035;
-  --control: #7c6e75;
-  --primary: #e8a0ae;
-  --on-primary: #2a0d14;
-  --primary-hover: #f0b8c3;
-  --accent: #e8a0ae;
-  --on-accent: #2a0d14;
-  --accent-soft: #3a1f27;
-  --accent-text: #e8a0ae;
-  --mark: #552634;
-  --link: #f0b3bf;
-  --success: #86c9a2;
-  --success-soft: #162a1f;
-  --warn: #e8ba6e;
-  --warn-soft: #2f2413;
-  --danger: #ff8e80;
-  --danger-soft: #3a1a17;
-  --focus: #e8a0ae;
-  --chart-1: #e8a0ae;
-  --chart-2: #8fb3cc;
-  --chart-3: #d6ae80;
-  --chart-4: #e8ba6e;
-  --chart-5: #7c6e75;
-  --shadow: 0 18px 60px -20px rgb(0 0 0 / 0.7);
-  --backdrop: rgb(0 0 0 / 0.62);
-  color-scheme: dark;
-}
-
-/* shadcn 别名 */
-:root[data-theme],
+/* Compatibility for standalone design previews. The app uses semantic tokens directly. */
 :root {
-  --background: var(--bg);
-  --foreground: var(--text);
-  --card: var(--surface);
-  --card-foreground: var(--text);
-  --popover: var(--surface);
-  --popover-foreground: var(--text);
-  --primary-foreground: var(--on-primary);
-  --secondary: var(--surface-2);
-  --secondary-foreground: var(--text);
-  --muted: var(--surface-2);
-  --muted-foreground: var(--text-2);
-  --border: var(--line);
-  --input: var(--control);
-  --ring: var(--focus);
-  --destructive: var(--danger);
-  --warning: var(--warn);
-  --sidebar: var(--surface);
-  --sidebar-foreground: var(--text);
-  --sidebar-border: var(--line);
-  --sidebar-ring: var(--focus);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--on-primary);
-  --sidebar-accent: var(--surface-2);
-  --sidebar-accent-foreground: var(--text);
-  
-  /* RuleLoop 旧别名映射（兼容性） */
   --rl-ui-page: var(--bg);
   --rl-ui-surface: var(--surface);
   --rl-ui-subtle: var(--surface-2);
   --rl-ui-text: var(--text);
   --rl-ui-text-muted: var(--text-2);
   --rl-ui-divider: var(--line);
-  --rl-ui-control-border: var(--control);
-  --rl-ui-action: var(--primary);
-  --rl-ui-action-hover: var(--primary-hover);
-  --rl-ui-on-action: var(--on-primary);
   --rl-ui-accent: var(--accent);
-  --rl-ui-focus: var(--focus);
   --rl-ui-warning-text: var(--warn);
-  --rl-ui-success-text: var(--success);
-  --rl-ui-danger-text: var(--danger);
-  --rl-ui-backdrop: var(--backdrop);
-  --rl-ui-swatch: var(--accent);
-  --rl-ui-color-scheme: var(--color-scheme);
 }

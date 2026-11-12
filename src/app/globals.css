@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "../../design-system/skills/ruleloop-ui-palette/assets/palette.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);
@@ -33,28 +33,28 @@
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
+  --color-accent: var(--surface-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-mark: var(--mark);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
-  --color-primary-hover: var(--rl-ui-action-hover);
-  --color-brand-accent: var(--rl-ui-accent);
-  --color-backdrop: var(--rl-ui-backdrop);
+  --color-primary-hover: var(--primary-hover);
+  --color-brand-accent: var(--accent);
+  --color-backdrop: var(--backdrop);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --font-sans:
-    var(--font-geist-sans), "Geist Fallback", ui-sans-serif, system-ui,
-    sans-serif;
-  --font-serif: var(--font-noto-serif), "Noto Serif SC", ui-serif, serif;
-  --font-mono:
-    var(--font-geist-mono), "Geist Mono Fallback", ui-monospace, monospace;
+  --font-sans: var(--rl-font-sans);
+  --font-serif: var(--rl-font-display);
+  --font-mono: var(--rl-font-mono);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -65,62 +65,51 @@
 }
 
 :root {
-  color-scheme: var(--rl-ui-color-scheme);
-  --background: var(--rl-ui-page);
-  --foreground: var(--rl-ui-text);
-  --card: var(--rl-ui-surface);
-  --card-foreground: var(--foreground);
-  --popover: var(--rl-ui-surface);
-  --popover-foreground: var(--foreground);
-  --primary: var(--rl-ui-action);
-  --primary-foreground: var(--rl-ui-on-action);
-  --secondary: var(--rl-ui-subtle);
-  --secondary-foreground: var(--foreground);
-  --muted: var(--rl-ui-subtle);
-  --muted-foreground: var(--rl-ui-text-muted);
-  --accent: var(--rl-ui-subtle);
-  --accent-foreground: var(--foreground);
-  --success: var(--rl-ui-success-text);
-  --success-foreground: var(--card);
-  --warning: var(--rl-ui-warning-text);
-  --warning-foreground: var(--card);
-  --destructive: var(--rl-ui-danger-text);
-  --destructive-foreground: var(--card);
-  --spirit: #664873;
-  --spirit-foreground: var(--card);
-  --info: #3c5776;
-  --info-foreground: var(--card);
-  --border: var(--rl-ui-divider);
-  --input: var(--rl-ui-control-border);
-  --ring: var(--rl-ui-focus);
-  --chart-1: var(--rl-ui-accent);
-  --chart-2: var(--success);
-  --chart-3: var(--spirit);
-  --chart-4: var(--info);
-  --chart-5: var(--destructive);
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary-foreground: var(--on-primary);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-2);
+  --accent-foreground: var(--text);
+  --success-foreground: var(--surface);
+  --warning: var(--warn);
+  --warning-foreground: var(--surface);
+  --destructive: var(--danger);
+  --destructive-foreground: var(--surface);
+  --spirit: var(--link);
+  --spirit-foreground: var(--surface);
+  --info: var(--link);
+  --info-foreground: var(--surface);
+  --border: var(--line);
+  --input: var(--control);
+  --ring: var(--focus);
   --radius: 0.75rem;
-  --sidebar: var(--card);
-  --sidebar-foreground: var(--foreground);
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text);
   --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--rl-ui-subtle);
-  --sidebar-accent-foreground: var(--foreground);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--ring);
-  --rl-ui-shadow: rgb(33 26 22 / 0.22);
+  --sidebar-primary-foreground: var(--on-primary);
+  --sidebar-accent: var(--surface-2);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--focus);
 }
 
-:root[data-ruleloop-palette="indigo"] {
-  --spirit: #d5bbdf;
-  --info: #aec6df;
-  --rl-ui-shadow: rgb(0 0 0 / 0.48);
+:root:is([data-theme="stone"], [data-theme="indigo"]) {
+  --rl-font-sans: var(--font-geist-sans);
+  --rl-font-display: var(--font-noto-serif);
+  --rl-font-mono: var(--font-geist-mono);
 }
 
-/* Apply text and background colors together when changing appearance. */
-[data-ruleloop-palette-switching] *,
-[data-ruleloop-palette-switching] *::before,
-[data-ruleloop-palette-switching] *::after {
-  transition: none;
+@media (prefers-reduced-motion: no-preference) {
+  [data-theme-transition] :where(body, main, header, section, aside, nav, article, div, a, button, input, select, textarea) {
+    transition: background-color 220ms ease, border-color 220ms ease, color 220ms ease;
+  }
 }
 
 @layer base {
@@ -132,22 +121,22 @@
   }
   body {
     @apply bg-background text-foreground;
-    letter-spacing: 0.008em;
   }
   :focus-visible {
     outline: 2px solid var(--ring);
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
   :is(input, textarea)::placeholder {
-    color: var(--muted-foreground);
+    color: var(--text-3);
   }
   ::selection {
-    background: var(--muted);
-    color: var(--foreground);
+    background: var(--accent-soft);
+    color: var(--text);
   }
   /* HUD 里的数字都是要被比较的,统一等宽 */
   th,
   td,
+  time,
   dd {
     font-variant-numeric: tabular-nums;
   }
@@ -161,9 +150,9 @@
 }
 
 :is(button, input, select, textarea):disabled:not([type="checkbox"], [type="radio"]) {
-  background-color: var(--rl-ui-disabled-surface);
-  border-color: var(--input);
-  color: var(--rl-ui-disabled-text);
+  background-color: var(--surface-2);
+  border-color: var(--line);
+  color: var(--text-3);
   opacity: 1;
 }
 
@@ -176,7 +165,7 @@
 }
 
 @utility shadow-card {
-  box-shadow: 0 10px 28px -22px var(--rl-ui-shadow);
+  box-shadow: var(--shadow);
 }
 
 @utility editorial-rule {
@@ -187,12 +176,8 @@
   background-color: var(--primary);
   color: var(--primary-foreground);
   &:hover {
-    background-color: var(--rl-ui-action-hover);
+    background-color: var(--primary-hover);
   }
-}
-
-@utility hud-glow {
-  text-shadow: 0 0 24px color-mix(in oklab, var(--foreground) 10%, transparent);
 }
 
 /* 语义色描边图标底座 */

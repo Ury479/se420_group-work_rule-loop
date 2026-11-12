@@ -18,6 +18,7 @@ import { usePathname } from "next/navigation";
 import { Languages } from "lucide-react";
 import { lookupTranslation } from "@/lib/page-translation-dict";
 import { cn } from "@/lib/utils";
+import { ThemePicker } from "@/components/theme-picker";
 
 const HAS_CHINESE = /[\u3400-\u9fff]/;
 const TRANSLATABLE_ATTRS = [
@@ -285,7 +286,10 @@ export function TranslateToggle({
   }, [register, registerInline]);
 
   return (
-    <span data-no-translate className="contents">
+    <span data-no-translate className="inline-flex shrink-0 items-center gap-2">
+      <span className="lg:hidden">
+        <ThemePicker lang={lang} placement="header" />
+      </span>
       <button
         type="button"
         onClick={toggle}
@@ -300,12 +304,12 @@ export function TranslateToggle({
           lang === "en"
             ? "border-primary/60 bg-primary text-primary-foreground"
             : "border-input text-muted-foreground hover:bg-muted hover:text-primary",
-          compact && "size-10 justify-center px-0",
+          compact ? "size-10 justify-center px-0" : "max-sm:size-10 max-sm:justify-center max-sm:px-0",
           className,
         )}
       >
         <Languages className="size-4" aria-hidden="true" />
-        {compact ? null : <span>{lang === "zh" ? "EN" : "中"}</span>}
+        {compact ? null : <span className="hidden sm:inline">{lang === "zh" ? "EN" : "中"}</span>}
       </button>
     </span>
   );
