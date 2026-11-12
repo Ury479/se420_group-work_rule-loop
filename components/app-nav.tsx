@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { Archive, BookOpen, Calculator, FileText, Folder, Home, Hourglass, Infinity, Landmark, Moon, Plus, RotateCcw, Settings, Sunrise, Zap } from "lucide-react"
 import { saveNavOrder } from "@/app/actions/preferences"
-import { ThemeSwitcher } from "@/components/theme-switcher"
+import { ThemeCycleButton } from "@/components/theme-cycle-button"
 import { cn } from "@/lib/utils"
 
 export const desktopLinks = [
@@ -133,26 +133,31 @@ export function AppNav({ navOrder = null }: { navOrder?: string[] | null }) {
           })}
         </nav>
         <div className="shrink-0 border-t border-sidebar-border p-3">
-          <ThemeSwitcher />
+          <ThemeCycleButton />
         </div>
       </aside>
 
       {!isFocusedMobilePage ? (
-        <nav aria-label="底部导航" className="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm lg:hidden">
-          <div className="mx-auto flex h-[6.2rem] max-w-[46rem] items-center justify-around px-2">
-            {mobileLinks.map(({ href, label, icon: Icon, primary }) => {
-              const active = href === "/" ? pathname === "/" : pathname.startsWith(href)
-              return (
-                <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("flex min-w-16 flex-col items-center gap-1.5 text-base", active ? "text-primary" : "text-muted-foreground")}>
-                  <span className={cn("flex size-10 items-center justify-center", primary && "hud-cta size-14 -translate-y-2 rounded-full")}>
-                    <Icon className={cn("size-7 stroke-[1.8]", primary && "size-9")} aria-hidden="true" />
-                  </span>
-                  <span className={cn(primary && "-translate-y-2")}>{label}</span>
-                </Link>
-              )
-            })}
+        <>
+          <nav aria-label="底部导航" className="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm lg:hidden">
+            <div className="mx-auto flex h-[6.2rem] max-w-[46rem] items-center justify-around px-2">
+              {mobileLinks.map(({ href, label, icon: Icon, primary }) => {
+                const active = href === "/" ? pathname === "/" : pathname.startsWith(href)
+                return (
+                  <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("flex min-w-16 flex-col items-center gap-1.5 text-base", active ? "text-primary" : "text-muted-foreground")}>
+                    <span className={cn("flex size-10 items-center justify-center", primary && "hud-cta size-14 -translate-y-2 rounded-full")}>
+                      <Icon className={cn("size-7 stroke-[1.8]", primary && "size-9")} aria-hidden="true" />
+                    </span>
+                    <span className={cn(primary && "-translate-y-2")}>{label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          </nav>
+          <div className="fixed right-4 top-4 z-50 lg:hidden">
+            <ThemeCycleButton />
           </div>
-        </nav>
+        </>
       ) : null}
     </>
   )

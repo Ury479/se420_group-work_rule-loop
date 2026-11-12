@@ -7,9 +7,9 @@ export function ThemeSettings() {
   const { theme, mode, setTheme, setMode } = useTheme()
 
   const themes = [
-    { id: "graphite" as const, label: "石墨", description: "深沉内敛，金色主色", color: "oklch(0.83 0.145 85)" },
-    { id: "petrol" as const, label: "汽油蓝", description: "冷静专注，蓝色主色", color: "oklch(0.65 0.18 258)" },
-    { id: "wine" as const, label: "酒红", description: "浓郁温暖，红色主色", color: "oklch(0.63 0.2 25)" },
+    { id: "graphite" as const, label: "石墨", description: "荧光批注 · 现代无衬线", accent: "#E3F25B" },
+    { id: "petrol" as const, label: "石油蓝", description: "赭石账簿 · 衬线斜体", accent: "#B98222" },
+    { id: "wine" as const, label: "酒红", description: "雾灰批注 · 楷体衬线", accent: "#E8A0AE" },
   ]
 
   const modes = [
@@ -40,7 +40,7 @@ export function ThemeSettings() {
               >
                 <div
                   className="mt-0.5 h-8 w-8 shrink-0 rounded-full border border-border"
-                  style={{ backgroundColor: t.color }}
+                  style={{ backgroundColor: t.accent }}
                 />
                 <div className="min-w-0 flex-1">
                   <div className="font-medium">{t.label}</div>
@@ -75,7 +75,7 @@ export function ThemeSettings() {
 
         <div className="rounded-lg border border-border bg-muted/50 p-4">
           <div className="text-sm text-muted-foreground">
-            主题设置保存在浏览器本地存储中，同一设备的不同浏览器需要分别设置。
+            配色方案包含独立的字体栈与排版样式。主题设置保存在浏览器本地存储中。桌面侧栏和移动端右上角的调色板按钮可快速循环切换配色。
           </div>
         </div>
       </CardContent>

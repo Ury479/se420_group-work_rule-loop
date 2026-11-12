@@ -10,12 +10,14 @@ interface ThemeContext {
   mode: Mode
   setTheme: (theme: Theme) => void
   setMode: (mode: Mode) => void
+  cycleTheme: () => void
   resolvedMode: "light" | "dark"
 }
 
 const ThemeContext = createContext<ThemeContext | undefined>(undefined)
 
 const STORAGE_KEY = "ruleloop.theme.v2"
+const OLD_STORAGE_KEY = "ruleloop.theme"
 const VALID_THEMES: Theme[] = ["graphite", "petrol", "wine"]
 const VALID_MODES: Mode[] = ["light", "dark", "system"]
 
@@ -32,13 +34,47 @@ function getSystemMode(): "light" | "dark" {
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
 }
 
+// 迁移旧主题值：石白 → graphite light，靛夜 → graphite dark
+function migrateOldTheme() {
+  if (typeof window === "undefined") return null
+
+  try {
+    const oldValue = localStorage.getItem(OLD_STORAGE_KEY)
+    if (oldValue) {
+      let migratedTheme: Theme = "graphite"
+      let migratedMode: Mode = "light"
+
+      if (oldValue === "靛夜" || oldValue === "dark") {
+        migratedMode = "dark"
+      }
+
+      const migrated = { theme: migratedTheme, mode: migratedMode }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated))
+      localStorage.removeItem(OLD_STORAGE_KEY)
+      return migrated
+    }
+  } catch {
+    // 静默失败
+  }
+  return null
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("graphite")
   const [mode, setModeState] = useState<Mode>("light")
-  const [resolvedMode, setResolvedMode] = useState<"light" | "dark">("dark")
+  const [resolvedMode, setResolvedMode] = useState<"light" | "dark">("light")
 
   useEffect(() => {
     try {
+      // 尝试迁移旧值
+      const migrated = migrateOldTheme()
+      if (migrated) {
+        setThemeState(migrated.theme)
+        setModeState(migrated.mode)
+        return
+      }
+
+      // 读取新值
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const parsed = JSON.parse(stored)
@@ -89,8 +125,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const cycleTheme = () => {
+    const currentIndex = VALID_THEMES.indexOf(theme)
+    const nextIndex = (currentIndex + 1) % VALID_THEMES.length
+    const nextTheme = VALID_THEMES[nextIndex]
+    setTheme(nextTheme)
+  }
+
   return (
-    <ThemeContext.Provider value={{ theme, mode, setTheme, setMode, resolvedMode }}>
+    <ThemeContext.Provider value={{ theme, mode, setTheme, setMode, cycleTheme, resolvedMode }}>
       {children}
     </ThemeContext.Provider>
   )
