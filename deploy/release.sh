@@ -55,30 +55,23 @@ log "从 GitHub 拉取最新代码 (${BRANCH})..."
 cd "${RELEASE_DIR}"
 git clone --depth 1 -b "${BRANCH}" "${REPO_URL}" .
 
-if [ -f "${DEPLOY_ROOT}/.env" ]; then
-  log "复制环境变量..."
-  cp "${DEPLOY_ROOT}/.env" .
-else
-  error ".env 文件不存在: ${DEPLOY_ROOT}/.env"
-  exit 1
-fi
-
-if ! grep -q "DATABASE_URL" .env; then
-  error ".env 中缺少 DATABASE_URL"
-  exit 1
-fi
+# 使用与 operate.sh 相同的配置包装
+compose() {
+  RELEASE_ID="$(basename ${RELEASE_DIR})" \
+  docker compose --env-file /opt/ruleloop/shared/images.env -f deploy/compose.yml "$@"
+}
 
 log "构建 Docker 镜像..."
-docker compose build web migrate
+compose build web migrate
 
 log "执行数据库迁移..."
-if ! docker compose run --rm migrate; then
+if ! compose run --rm migrate; then
   error "数据库迁移失败"
   exit 1
 fi
 
 log "启动新容器..."
-if ! docker compose up -d --no-deps --wait web; then
+if ! compose up -d --no-deps --wait web; then
   error "容器启动失败"
   exit 1
 fi
@@ -87,7 +80,7 @@ log "等待服务就绪..."
 sleep 5
 
 log "执行健康检查..."
-HEALTH_CHECK_URL="http://localhost:3000"
+HEALTH_CHECK_URL="http://127.0.0.1:3100/sign-in"
 MAX_RETRIES=10
 RETRY_COUNT=0
 
@@ -110,7 +103,9 @@ if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
   if [ -n "$PREV_RELEASE" ]; then
     warn "回滚到上一版本: ${PREV_RELEASE}"
     cd "${DEPLOY_ROOT}/releases/${PREV_RELEASE}"
-    docker compose up -d --no-deps --wait web
+    RELEASE_ID="${PREV_RELEASE}" \
+    docker compose --env-file /opt/ruleloop/shared/images.env -f deploy/compose.yml \
+      up -d --no-deps --wait web
     
     rm -rf "${RELEASE_DIR}"
     
@@ -126,13 +121,12 @@ log "切换 current 符号链接..."
 cd "${DEPLOY_ROOT}"
 ln -sfn "${RELEASE_DIR}" current
 
-log "清理旧容器..."
-cd "${RELEASE_DIR}"
-docker compose down --remove-orphans || true
-
 log "清理旧版本（保留最近 5 个）..."
 cd "${DEPLOY_ROOT}/releases"
 ls -t | tail -n +6 | xargs rm -rf 2>/dev/null || true
+
+log "清理未使用的镜像..."
+docker image prune -f --filter "label=com.docker.compose.project=ruleloop-app" || true
 
 log "========================================="
 log "部署成功！"
@@ -140,4 +134,5 @@ log "版本: $(basename ${RELEASE_DIR})"
 log "访问: https://ruleloop.xiaobulab.cn"
 log "========================================="
 
-docker compose -f "${RELEASE_DIR}/docker-compose.yml" ps
+cd "${RELEASE_DIR}"
+compose ps
