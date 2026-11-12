@@ -67,37 +67,51 @@ function migrateOldSettings() {
   return null
 }
 
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "stone"
+  try {
+    const migrated = migrateOldSettings()
+    if (migrated) return migrated.theme
+
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      return parseTheme(parsed.theme)
+    }
+  } catch {
+    // 静默回退
+  }
+  return "stone"
+}
+
+function getInitialMode(): Mode {
+  if (typeof window === "undefined") return "light"
+  try {
+    const migrated = migrateOldSettings()
+    if (migrated) return migrated.mode
+
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      return parseMode(parsed.mode)
+    }
+  } catch {
+    // 静默回退
+  }
+  return "light"
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("stone")
-  const [mode, setModeState] = useState<Mode>("light")
-  const [resolvedMode, setResolvedMode] = useState<"light" | "dark">("light")
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme)
+  const [mode, setModeState] = useState<Mode>(getInitialMode)
+  const [resolvedMode, setResolvedMode] = useState<"light" | "dark">(() =>
+    typeof window === "undefined" ? "dark" : getSystemMode()
+  )
 
   useEffect(() => {
-    try {
-      // 尝试迁移旧值
-      const migrated = migrateOldSettings()
-      if (migrated) {
-        setThemeState(migrated.theme)
-        setModeState(migrated.mode)
-        return
-      }
-
-      // 读取新值
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        setThemeState(parseTheme(parsed.theme))
-        setModeState(parseMode(parsed.mode))
-      }
-    } catch {
-      // 回退到默认值
-    }
-
     const updateSystemMode = () => {
-      const system = getSystemMode()
-      setResolvedMode(system)
+      setResolvedMode(getSystemMode())
     }
-    updateSystemMode()
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: light)")
     mediaQuery.addEventListener("change", updateSystemMode)
@@ -106,7 +120,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const resolved = mode === "system" ? getSystemMode() : mode
-    setResolvedMode(resolved)
     document.documentElement.setAttribute("data-theme", theme)
     document.documentElement.setAttribute("data-mode", resolved)
   }, [theme, mode])
