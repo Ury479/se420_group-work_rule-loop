@@ -87,7 +87,7 @@ export default async function RuleDetailPage({
           </span>
         </span>
 
-        <h1 className="hud-glow font-serif text-2xl font-semibold leading-relaxed tracking-wide text-balance text-primary md:text-3xl">
+        <h1 className="font-serif text-2xl font-semibold leading-relaxed tracking-wide text-balance text-primary md:text-3xl">
           {rule.ruleText}
         </h1>
 

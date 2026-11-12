@@ -66,7 +66,7 @@ function BoolChip({
         value
           ? danger
             ? "border-destructive/50 bg-destructive/10 text-destructive"
-            : "bg-muted text-foreground shadow-[inset_0_-2px_var(--rl-ui-accent)]"
+            : "bg-muted text-foreground shadow-[inset_0_-2px_var(--accent)]"
           : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >

@@ -185,7 +185,7 @@ export function FinalDecisionForm({
           {FINAL_DECISIONS.map((option) => (
             <label
               key={option.value}
-              className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-input px-2.5 text-sm has-[:checked]:bg-muted has-[:checked]:shadow-[inset_0_-2px_var(--rl-ui-accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring has-[:disabled]:cursor-default has-[:disabled]:opacity-65"
+              className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-lg border border-input px-2.5 text-sm has-[:checked]:bg-muted has-[:checked]:shadow-[inset_0_-2px_var(--accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring has-[:disabled]:cursor-default has-[:disabled]:opacity-65"
             >
               <input
                 type="radio"

@@ -20,7 +20,8 @@ import {
   Zap,
 } from "lucide-react";
 import { saveNavOrder } from "@/app/actions/preferences";
-import { ThemeCycleButton } from "@/components/theme-cycle-button";
+import { useTranslator } from "@/components/page-translator";
+import { ThemePicker } from "@/components/theme-picker";
 import { cn } from "@/lib/utils";
 
 const primaryLinks = [
@@ -66,6 +67,7 @@ export function orderModuleLinks(navOrder: string[] | null) {
 
 export function AppNav({ navOrder = null }: { navOrder?: string[] | null }) {
   const pathname = usePathname();
+  const { lang } = useTranslator();
   const currentPath = pathname === "/lifespan" ? "/" : pathname;
   const compact = pathname === "/habits";
   const isFocusedMobilePage =
@@ -132,7 +134,7 @@ export function AppNav({ navOrder = null }: { navOrder?: string[] | null }) {
           aria-label="RuleLoop 首页"
         >
           <Infinity
-            className="size-11 stroke-[1.7] text-brand-accent"
+            className="size-11 stroke-[1.7] text-accent-text"
             aria-hidden="true"
           />
           <span className="font-serif text-sm font-semibold tracking-wide">
@@ -191,15 +193,12 @@ export function AppNav({ navOrder = null }: { navOrder?: string[] | null }) {
           )}
         </nav>
         <div className="shrink-0 border-t border-sidebar-border p-3">
-          <ThemeCycleButton />
+          <ThemePicker lang={lang} placement="sidebar" />
         </div>
       </aside>
 
       {!isFocusedMobilePage ? (
         <>
-          <div className="fixed right-4 top-4 z-50 lg:hidden">
-            <ThemeCycleButton />
-          </div>
         <nav
           aria-label="底部导航"
           className="fixed inset-x-0 bottom-0 z-50 border-t border-sidebar-border bg-sidebar/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-sm lg:hidden"

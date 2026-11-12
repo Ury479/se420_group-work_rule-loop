@@ -74,7 +74,7 @@ export function AuthForm({
     <div className="flex w-full max-w-md flex-col gap-8 font-serif">
       <div className="flex flex-col items-center gap-2 text-center">
         <Infinity
-          className="size-12 stroke-[1.6] text-brand-accent"
+          className="size-12 stroke-[1.6] text-accent-text"
           aria-hidden="true"
         />
         <span className="font-serif text-2xl font-semibold tracking-wide">

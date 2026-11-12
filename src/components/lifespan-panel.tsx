@@ -106,7 +106,7 @@ export function LifespanPanel({
           <CalendarClock className="size-4" aria-hidden="true" />
           剩余天数
         </h2>
-        <p className="hud-glow mt-1 font-serif text-6xl font-medium leading-none tracking-tight tabular-nums text-primary">
+        <p className="mt-1 font-serif text-6xl font-medium leading-none tracking-tight tabular-nums text-primary">
           {initial.daysRemaining.toLocaleString()}
         </p>
         <div className="mt-5">

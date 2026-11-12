@@ -1,86 +1,94 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useTheme } from "@/components/theme-provider"
+import { useState, type KeyboardEvent } from "react";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import { ThemeSwatch } from "@/components/theme-swatch";
+import { useTheme } from "@/components/theme-provider";
+import { useTranslator } from "@/components/page-translator";
+import { EXACT_DICT } from "@/lib/page-translation-dict";
+import { fixedMode, THEMES, type Theme } from "@/lib/ruleloop-palette";
+
+const modes = [
+  { id: "light", label: "亮色模式" },
+  { id: "dark", label: "暗色模式" },
+  { id: "system", label: "跟随系统" },
+] as const;
+
+function moveSelection(event: KeyboardEvent<HTMLFieldSetElement>) {
+  const step = event.key === "ArrowLeft" ? -1 : event.key === "ArrowRight" ? 1 : 0;
+  if (!step) return;
+  const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
+  const index = buttons.findIndex((button) => button === event.target);
+  if (index < 0) return;
+  event.preventDefault();
+  const next = buttons[(index + step + buttons.length) % buttons.length];
+  next.focus();
+  next.click();
+}
 
 export function ThemeSettings() {
-  const { theme, mode, setTheme, setMode } = useTheme()
-
-  const themes = [
-    { id: "stone" as const, label: "石白", description: "原始浅色 · 温润质朴", accent: "#A95A33" },
-    { id: "indigo" as const, label: "靛夜", description: "原始深色 · 沉静专注", accent: "#D99B73" },
-    { id: "graphite" as const, label: "铅灰", description: "荧光批注 · 现代无衬线", accent: "#E3F25B" },
-    { id: "petrol" as const, label: "石油蓝", description: "赭石账簿 · 衬线斜体", accent: "#B98222" },
-    { id: "wine" as const, label: "酒红", description: "雾灰批注 · 楷体衬线", accent: "#E8A0AE" },
-  ]
-
-  const modes = [
-    { id: "light" as const, label: "亮色模式", description: "明亮清晰" },
-    { id: "dark" as const, label: "暗色模式", description: "护眼舒适" },
-    { id: "system" as const, label: "跟随系统", description: "自动切换" },
-  ]
+  const { theme, mode, setTheme, setMode } = useTheme();
+  const { lang } = useTranslator();
+  const [announcement, setAnnouncement] = useState("");
+  const classic = fixedMode(theme);
+  const option = "min-h-11 min-w-0 rounded-lg border border-input px-3 py-2.5 text-left hover:bg-accent aria-pressed:border-ring aria-pressed:bg-accent-soft";
+  function selectTheme(id: Theme, label: string) {
+    setTheme(id);
+    setAnnouncement(label);
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>外观</CardTitle>
+        <h2 className="text-base leading-snug font-medium">外观</h2>
         <CardDescription>选择主题配色与明暗模式</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <div className="mb-3 text-sm font-medium">主题配色</div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {themes.map((t) => (
+      <CardContent className="space-y-5">
+        <fieldset onKeyDown={moveSelection} className="min-w-0">
+          <legend className="mb-3 text-sm font-medium">界面主题</legend>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {THEMES.map(({ id, label, description }) => (
               <button
-                key={t.id}
-                onClick={() => setTheme(t.id)}
-                className={`flex items-start gap-3 rounded-lg border p-4 text-left transition-colors ${
-                  theme === t.id
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:bg-accent"
-                }`}
+                type="button"
+                key={id}
+                onClick={() => selectTheme(id, label)}
+                aria-pressed={theme === id}
+                aria-labelledby={`theme-${id}-label`}
+                className={`flex items-center gap-3 ${option}`}
               >
-                <div
-                  className="mt-0.5 h-8 w-8 shrink-0 rounded-full border border-border"
-                  style={{ backgroundColor: t.accent }}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium">{t.label}</div>
-                  <div className="text-sm text-muted-foreground">{t.description}</div>
-                </div>
+                <ThemeSwatch theme={id} />
+                <span className="min-w-0">
+                  <span id={`theme-${id}-label`} className="block font-medium">{label}</span>
+                  <span className="block text-xs text-muted-foreground">{description}</span>
+                </span>
               </button>
             ))}
           </div>
-        </div>
+        </fieldset>
 
-        <div>
-          <div className="mb-3 text-sm font-medium">明暗模式</div>
-          <div className="space-y-2">
-            {modes.map((m) => (
+        <fieldset disabled={Boolean(classic)} onKeyDown={moveSelection} className="min-w-0">
+          <legend className="mb-3 text-sm font-medium">明暗模式</legend>
+          <div className="flex flex-wrap gap-2">
+            {modes.map(({ id, label }) => (
               <button
-                key={m.id}
-                onClick={() => setMode(m.id)}
-                className={`flex w-full items-start gap-3 rounded-lg border p-4 text-left transition-colors ${
-                  mode === m.id
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:bg-accent"
-                }`}
+                type="button"
+                key={id}
+                onClick={() => setMode(id)}
+                aria-pressed={(classic ?? mode) === id}
+                className={option}
               >
-                <div className="flex-1">
-                  <div className="font-medium">{m.label}</div>
-                  <div className="text-sm text-muted-foreground">{m.description}</div>
-                </div>
+                {label}
               </button>
             ))}
           </div>
-        </div>
-
-        <div className="rounded-lg border border-border bg-muted/50 p-4">
-          <div className="text-sm text-muted-foreground">
-            主题配色包含独立的字体栈与排版样式。设置保存在浏览器本地存储中。桌面侧栏和移动端右上角的调色板按钮可快速循环切换。
-          </div>
-        </div>
+        </fieldset>
+        {classic && (
+          <p className="text-sm text-muted-foreground">石白固定为浅色，靛夜固定为深色。</p>
+        )}
+        <p className="sr-only" role="status" data-no-translate>
+          {announcement && (lang === "en" ? `Switched to ${EXACT_DICT[announcement]}` : `已切换到「${announcement}」`)}
+        </p>
       </CardContent>
     </Card>
-  )
+  );
 }

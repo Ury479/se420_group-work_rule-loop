@@ -115,7 +115,7 @@ export function NightRitualPanel({
         {summary.configured ? (
           <div className="mt-2 flex flex-col gap-2">
             <p className="flex items-end gap-2">
-              <span className="hud-glow font-serif text-5xl font-medium leading-none tracking-tight tabular-nums text-primary">
+              <span className="font-serif text-5xl font-medium leading-none tracking-tight tabular-nums text-primary">
                 {summary.daysRemaining.toLocaleString()}
               </span>
               <span className="pb-1 text-sm text-muted-foreground">天剩余</span>

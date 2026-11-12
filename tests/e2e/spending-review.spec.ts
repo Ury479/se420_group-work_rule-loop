@@ -254,15 +254,16 @@ test("reviews spending with a durable queue, cooling-off, retry and a human deci
 
   try {
     await page.setViewportSize({ width: 1440, height: 950 });
+    await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/spending-review");
     await expect(page.locator("body")).toHaveCSS(
       "background-color",
-      "rgb(252, 247, 241)",
+      "rgb(245, 245, 242)",
     );
     const submit = page.getByRole("button", { name: "提交审核", exact: true });
-    await expect(submit).toHaveCSS("background-color", "rgb(33, 26, 22)");
+    await expect(submit).toHaveCSS("background-color", "rgb(29, 29, 31)");
     await page.screenshot({
-      path: testInfo.outputPath("stone-1440.png"),
+      path: testInfo.outputPath("graphite-1440.png"),
       fullPage: true,
     });
     await submit.click();
@@ -331,7 +332,7 @@ test("reviews spending with a durable queue, cooling-off, retry and a human deci
       page.getByRole("heading", { name: "先完成冷静期" }),
     ).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute(
-      "data-ruleloop-palette",
+      "data-theme",
       "indigo",
     );
     await page.screenshot({

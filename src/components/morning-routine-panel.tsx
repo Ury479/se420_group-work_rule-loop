@@ -90,7 +90,7 @@ export function MorningRoutinePanel({
         </h2>
         {firstTask ? (
           <div className="mt-2">
-            <p className="hud-glow font-serif text-2xl font-semibold leading-tight text-balance text-primary">
+            <p className="font-serif text-2xl font-semibold leading-tight text-balance text-primary">
               {firstTask.title}
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">

@@ -329,7 +329,7 @@ export default async function DashboardPage() {
           </p>
           <h2
             id="today-title"
-            className="hud-glow mt-2 font-serif text-3xl font-semibold leading-tight text-balance text-primary"
+            className="mt-2 font-serif text-3xl font-semibold leading-tight text-balance text-primary"
           >
             {active?.title ?? "没有待确认事项"}
           </h2>
