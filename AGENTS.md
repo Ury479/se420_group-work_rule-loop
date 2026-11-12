@@ -1,3 +1,14 @@
+## 部署与环境配置
+
+- **生产环境**: https://ruleloop.xiaobulab.cn 运行在自托管 VPS (非 Vercel)
+- **部署流程**: 代码合并到 main 分支**不会自动上线**，需手动执行发版脚本
+- **连接信息**: 从项目根目录的 `.env.deploy` 文件读取（该文件**不提交到仓库**，变量说明见 `.env.deploy.example`）
+- **发版命令**: 在服务器上执行 `cd /opt/ruleloop && ./deploy/release.sh`，详见 `deploy/RUNBOOK.md`
+- **安全规则**: 
+  - **严禁**在任何提交的文件、PR 描述、代码注释、日志输出、聊天记录中写入密码、SSH 密钥、数据库凭据等敏感信息
+  - `.env.deploy`、`/opt/ruleloop/shared/*.env` 等配置文件仅在服务器上存在，不可打印、复制或提交
+  - 仓库是公开的，可以写入服务器 IP (103.108.67.49) 但不可写入其他凭据
+
 ## Design-First Workflow
 
 - 所有产品界面、视觉系统、页面重构和前端设计任务，默认先使用 `guizang-ppt-skill` 做视觉方向、网格、排版、色彩、节奏和质量检查，再进入正式前端开发。

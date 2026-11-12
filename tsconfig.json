@@ -42,6 +42,9 @@
     "node_modules",
     ".upgrade",
     ".local",
-    "website"
+    "website",
+    "tests",
+    "playwright.config.ts",
+    "vitest.config.ts"
   ]
 }

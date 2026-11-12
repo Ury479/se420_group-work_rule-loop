@@ -24,7 +24,7 @@
 
 ## 界面外观
 
-账号版默认使用石白。在「设置 → 外观」可切换到靛夜，选择保存在当前浏览器，刷新后首屏直接使用所选主题。[配色定义](design-system/skills/ruleloop-ui-palette/assets/palette.css)
+账号版提供五套主题：**石白**（默认）、**靛夜**、**铅灰**、**石油蓝**、**酒红**。在「设置 → 外观」可切换主题与明暗模式，选择保存在当前浏览器，刷新后首屏直接使用所选主题。桌面侧栏和移动端右上角的调色板按钮可快速循环切换五套主题。[配色定义](design-system/skills/ruleloop-ui-palette/assets/palette.css)
 
 ## 本地启动
 

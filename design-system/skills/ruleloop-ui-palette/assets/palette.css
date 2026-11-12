@@ -1,5 +1,6 @@
-/* RuleLoop 定稿配色系统 - graphite/petrol/wine × light/dark */
-/* 用法：<html data-theme="graphite|petrol|wine" data-mode="light|dark">，缺省 graphite + light */
+/* RuleLoop 五套主题系统 */
+/* 用法：<html data-theme="stone|indigo|graphite|petrol|wine" data-mode="light|dark"> */
+/* 默认：石白(stone) */
 
 /* 字体排版基础 */
 :root {
@@ -21,9 +22,81 @@
   --leading-label: 1.5;
 }
 
-/* A 铅灰·荧光批注 (Graphite) */
-:root[data-theme="graphite"],
-:root {
+/* 1. 石白 (Stone) - 原始浅色主题，默认 */
+:root,
+:root[data-theme="stone"] {
+  --bg: #FCF7F1;
+  --surface: #FFFDF9;
+  --surface-2: #EEE8E1;
+  --text: #211A16;
+  --text-2: #695C52;
+  --text-3: #695C52;
+  --line: #D9CFC4;
+  --control: #827367;
+  --primary: #211A16;
+  --on-primary: #FFFDF9;
+  --primary-hover: #100D0B;
+  --accent: #A95A33;
+  --on-accent: #FFFDF9;
+  --accent-soft: #F5E6DC;
+  --accent-text: #A95A33;
+  --mark: #A95A33;
+  --link: #211A16;
+  --success: #355C44;
+  --success-soft: #E8F2EC;
+  --warn: #854624;
+  --warn-soft: #F7EAE0;
+  --danger: #A03026;
+  --danger-soft: #FAE6E4;
+  --focus: #211A16;
+  --chart-1: #211A16;
+  --chart-2: #A95A33;
+  --chart-3: #355C44;
+  --chart-4: #854624;
+  --chart-5: #827367;
+  --shadow: 0 18px 50px -24px rgb(20 20 20 / 0.28);
+  --backdrop: oklch(15% .015 55 / .65);
+  color-scheme: light;
+}
+
+/* 2. 靛夜 (Indigo) - 原始深色主题 */
+:root[data-theme="indigo"] {
+  --bg: #181D2B;
+  --surface: #202737;
+  --surface-2: #2B3344;
+  --text: #FCF7F1;
+  --text-2: #C5BDB4;
+  --text-3: #C5BDB4;
+  --line: #424B5D;
+  --control: #9A9EA8;
+  --primary: #FCF7F1;
+  --on-primary: #181D2B;
+  --primary-hover: #FFFFFF;
+  --accent: #D99B73;
+  --on-accent: #181D2B;
+  --accent-soft: #3A3028;
+  --accent-text: #D99B73;
+  --mark: #D99B73;
+  --link: #D99B73;
+  --success: #AFD0B6;
+  --success-soft: #1F2B24;
+  --warn: #E6B58D;
+  --warn-soft: #332B22;
+  --danger: #F3ADA0;
+  --danger-soft: #3A2724;
+  --focus: #FCF7F1;
+  --chart-1: #FCF7F1;
+  --chart-2: #D99B73;
+  --chart-3: #AFD0B6;
+  --chart-4: #E6B58D;
+  --chart-5: #9A9EA8;
+  --shadow: 0 18px 60px -20px rgb(0 0 0 / 0.7);
+  --backdrop: oklch(10% .02 270 / .75);
+  color-scheme: dark;
+}
+
+/* 3. 铅灰·荧光批注 (Graphite) */
+:root[data-theme="graphite"] {
   --font-display: "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC",
     "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   --font-sans: "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "MiSans",
@@ -34,7 +107,6 @@
   --latin-style: normal;
 }
 
-:root,
 :root[data-theme="graphite"][data-mode="light"],
 :root[data-theme="graphite"]:not([data-mode="dark"]) {
   --bg: #f5f5f2;
@@ -71,8 +143,7 @@
   color-scheme: light;
 }
 
-:root[data-theme="graphite"][data-mode="dark"],
-:root:not([data-theme])[data-mode="dark"] {
+:root[data-theme="graphite"][data-mode="dark"] {
   --bg: #111113;
   --surface: #1b1b1e;
   --surface-2: #26262a;
@@ -107,7 +178,7 @@
   color-scheme: dark;
 }
 
-/* B 石油蓝·赭石账簿 (Petrol) */
+/* 4. 石油蓝·赭石账簿 (Petrol) */
 :root[data-theme="petrol"] {
   --font-display: Charter, "Bitstream Charter", "Songti SC", "Noto Serif SC", "Source Han Serif SC", STSong,
     "SimSun", serif;
@@ -190,7 +261,7 @@
   color-scheme: dark;
 }
 
-/* C 酒红·雾灰批注 (Wine) */
+/* 5. 酒红·雾灰批注 (Wine) */
 :root[data-theme="wine"] {
   --font-display: "Iowan Old Style", "Kaiti SC", "LXGW WenKai", STKaiti, KaiTi, "Noto Serif SC", serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Noto Sans SC",

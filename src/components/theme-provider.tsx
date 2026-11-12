@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 
-type Theme = "graphite" | "petrol" | "wine"
+type Theme = "stone" | "indigo" | "graphite" | "petrol" | "wine"
 type Mode = "light" | "dark" | "system"
 
 interface ThemeContext {
@@ -17,15 +17,15 @@ interface ThemeContext {
 const ThemeContext = createContext<ThemeContext | undefined>(undefined)
 
 const STORAGE_KEY = "ruleloop.theme.v2"
-const VALID_THEMES: Theme[] = ["graphite", "petrol", "wine"]
-const VALID_MODES: Mode[] = ["light", "dark", "system"]
+const THEME_ORDER: Theme[] = ["stone", "indigo", "graphite", "petrol", "wine"]
 
 function parseTheme(value: unknown): Theme {
-  return VALID_THEMES.includes(value as Theme) ? (value as Theme) : "graphite"
+  return THEME_ORDER.includes(value as Theme) ? (value as Theme) : "stone"
 }
 
 function parseMode(value: unknown): Mode {
-  return VALID_MODES.includes(value as Mode) ? (value as Mode) : "light"
+  const validModes: Mode[] = ["light", "dark", "system"]
+  return validModes.includes(value as Mode) ? (value as Mode) : "light"
 }
 
 function getSystemMode(): "light" | "dark" {
@@ -33,8 +33,8 @@ function getSystemMode(): "light" | "dark" {
   return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
 }
 
-// 迁移旧主题值：石白 → graphite light，靛夜 → graphite dark
-function migrateOldPalette() {
+// 迁移旧值：保持用户原选择
+function migrateOldSettings() {
   if (typeof window === "undefined") return null
 
   try {
@@ -44,14 +44,16 @@ function migrateOldPalette() {
     
     if (paletteCookie) {
       const value = paletteCookie.split('=')[1]
-      let migratedTheme: Theme = "graphite"
-      let migratedMode: Mode = "light"
+      let migratedTheme: Theme = "stone"
 
-      if (value === "indigo") {
-        migratedMode = "dark"
+      // 直接映射旧值
+      if (value === "stone" || value === "") {
+        migratedTheme = "stone"
+      } else if (value === "indigo") {
+        migratedTheme = "indigo"
       }
 
-      const migrated = { theme: migratedTheme, mode: migratedMode }
+      const migrated = { theme: migratedTheme, mode: "light" as Mode }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated))
       
       // 删除旧cookie
@@ -66,14 +68,14 @@ function migrateOldPalette() {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("graphite")
+  const [theme, setThemeState] = useState<Theme>("stone")
   const [mode, setModeState] = useState<Mode>("light")
   const [resolvedMode, setResolvedMode] = useState<"light" | "dark">("light")
 
   useEffect(() => {
     try {
       // 尝试迁移旧值
-      const migrated = migrateOldPalette()
+      const migrated = migrateOldSettings()
       if (migrated) {
         setThemeState(migrated.theme)
         setModeState(migrated.mode)
@@ -132,9 +134,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }
 
   const cycleTheme = () => {
-    const currentIndex = VALID_THEMES.indexOf(theme)
-    const nextIndex = (currentIndex + 1) % VALID_THEMES.length
-    const nextTheme = VALID_THEMES[nextIndex]
+    const currentIndex = THEME_ORDER.indexOf(theme)
+    const nextIndex = (currentIndex + 1) % THEME_ORDER.length
+    const nextTheme = THEME_ORDER[nextIndex]
     setTheme(nextTheme)
   }
 
